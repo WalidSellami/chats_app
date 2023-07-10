@@ -1,5 +1,6 @@
 
 import 'package:bloc/bloc.dart';
+import 'package:chat/shared/cubit/appCubit/AppCubit.dart';
 import 'package:chat/shared/cubit/checkCubit/CheckStates.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,7 +19,7 @@ class CheckCubit extends Cubit<CheckStates> {
   bool isSplashScreen = true;
 
 
-  void checkConnection() {
+  void checkConnection(context) {
 
     InternetConnectionChecker().onStatusChange.listen((status) {
 
@@ -44,6 +45,11 @@ class CheckCubit extends Cubit<CheckStates> {
         ),
         background: (hasInternet) ? HexColor('158b96') : Colors.red,
       ) : null;
+
+      if(hasInternet) {
+        AppCubit.get(context).getPosts();
+        AppCubit.get(context).getAllUsers();
+      }
 
       emit(SuccessCheckState());
     });

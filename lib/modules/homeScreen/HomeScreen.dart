@@ -1,6 +1,8 @@
 import 'package:chat/models/postModel/PostModel.dart';
+import 'package:chat/models/userModel/UserModel.dart';
 import 'package:chat/modules/commentScreen/CommentsScreen.dart';
 import 'package:chat/modules/commentScreen/PostCommentScreen.dart';
+import 'package:chat/modules/usersLikeScreen/UsersLikeScreen.dart';
 import 'package:chat/shared/adaptive/circularIndicator/CircularIndicator.dart';
 import 'package:chat/shared/adaptive/circularIndicator/CircularRingIndicator.dart';
 import 'package:chat/shared/components/Components.dart';
@@ -56,6 +58,7 @@ class _HomeScreenState extends State<HomeScreen> {
               builder: (context , state) {
 
                 var cubit = AppCubit.get(context);
+                var user = cubit.userProfile;
                 var posts = cubit.posts;
                 var postsId = cubit.postsId;
                 var numberLikes = cubit.numberLikes;
@@ -76,7 +79,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return Future<void>.delayed(const Duration(seconds: 2));
                       },
                       child: ListView.builder(
-                        itemBuilder: (context , index) => buildItemPost(posts[index], postsId[index] , numberLikes , numberComments , context),
+                        itemBuilder: (context , index) => buildItemPost(user , posts[index], postsId[index] , numberLikes , numberComments , context),
                         itemCount: posts.length,
                       ),
                     ),
@@ -90,7 +93,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                       ),
                     ),
-                  ) :const Center(
+                  ) : const Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -117,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget buildItemPost(PostModel post , postId , numberLikes , numberComments  , context) => Card(
+  Widget buildItemPost(UserModel? user , PostModel post , postId , numberLikes , numberComments  , context) => Card(
     elevation: 3.0,
     margin: const EdgeInsets.symmetric(
       horizontal: 10.0,
@@ -284,20 +287,30 @@ class _HomeScreenState extends State<HomeScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Icon(
-                    (numberLikes[postId] != 0) ? Icons.favorite_outlined : Icons.favorite_outline_rounded,
-                    size: 19.0,
-                    color: HexColor('f9325f'),
+              InkWell(
+                borderRadius: BorderRadius.circular(4.0),
+                onTap: () {
+                  AppCubit.get(context).getUsersLikes(postId: postId);
+                  Navigator.of(context).push(createRoute(screen: UsersLikeScreen(postId: postId)));
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Row(
+                    children: [
+                      Icon(
+                        (numberLikes[postId] != 0) ? Icons.favorite_outlined : Icons.favorite_outline_rounded,
+                        size: 19.0,
+                        color: HexColor('f9325f'),
+                      ),
+                      Text(
+                        ' ${numberLikes[postId] ?? 0}',
+                        style: const TextStyle(
+                          fontSize: 14.0,
+                        ),
+                      ),
+                    ],
                   ),
-                  Text(
-                    ' ${numberLikes[postId] ?? 0}',
-                    style: const TextStyle(
-                      fontSize: 14.0,
-                    ),
-                  ),
-                ],
+                ),
               ),
               InkWell(
                 borderRadius: BorderRadius.circular(4.0),
@@ -373,7 +386,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     if(post.like == false) {
 
-                      AppCubit.get(context).likePost(postId: postId);
+                      AppCubit.get(context).likePost(
+                          userName: (user?.userName).toString(),
+                          imageProfile: (user?.imageProfile).toString(),
+                          imageCover: (user?.imageCover).toString(),
+                          email: (user?.email).toString(),
+                          phone: (user?.phone).toString(),
+                          bio: (user?.bio).toString(),
+                          postId: postId);
 
                     } else {
 
@@ -395,8 +415,14 @@ class _HomeScreenState extends State<HomeScreen> {
                           size: 19.0,
                           color: HexColor('f9325f'),
                         ),
-                        const Text(
-                          ' Like',
+                        (post.like == true) ? const Text(
+                          ' Liked',
+                          style: TextStyle(
+                            color: Colors.red,
+                            fontSize: 13.0,
+                          ),
+                        ) : const Text(
+                           ' Like',
                           style: TextStyle(
                             fontSize: 13.0,
                           ),

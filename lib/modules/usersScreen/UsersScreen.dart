@@ -117,7 +117,10 @@ class _UsersScreenState extends State<UsersScreen> {
        Navigator.of(context).push(createRoute(screen: UserDetailsScreen(user: user)));
     },
     child: Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.symmetric(
+        vertical: 10.0,
+        horizontal: 12.0,
+      ),
       child: Row(
         children: [
           CircleAvatar(

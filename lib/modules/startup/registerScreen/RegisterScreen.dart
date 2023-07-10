@@ -94,7 +94,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               height: 90.0,
                             ),
                             const SizedBox(
-                              height: 35.0,
+                              height: 30.0,
                             ),
                             const Text(
                               'Register now to join!',

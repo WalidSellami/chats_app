@@ -283,6 +283,13 @@ class ErrorDeletePostImageAppState extends AppStates {
 }
 
 
+// Users Likes
+class LoadingGetUsersLikesAppState extends AppStates {}
+
+class SuccessGetUsersLikesAppState extends AppStates {}
+
+
+class SuccessGetNumberNoticeAppState extends AppStates {}
 
 // Send Notification
 class SuccessSendNotificationAppState extends AppStates {}

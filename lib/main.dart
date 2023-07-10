@@ -81,8 +81,6 @@ Future<void> main() async {
 
 
 
-
-
   Widget? widget;
 
   if(uId != null) {
@@ -108,7 +106,7 @@ class MyApp extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(create: (BuildContext context) => AppCubit()),
-        BlocProvider(create: (BuildContext context) => CheckCubit()..checkConnection()),
+        BlocProvider(create: (BuildContext context) => CheckCubit()..checkConnection(context)),
         BlocProvider(create: (BuildContext context) => ThemeCubit()..changeMode(isDark ?? false),
         ),
       ],

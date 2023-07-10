@@ -15,12 +15,10 @@ import 'package:chat/shared/components/Constants.dart';
 import 'package:chat/shared/cubit/appCubit/AppStates.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
-import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 class AppCubit extends Cubit<AppStates> {
@@ -30,37 +28,37 @@ class AppCubit extends Cubit<AppStates> {
 
   int currentIndex = 0;
 
-  List<SalomonBottomBarItem> items = [
-    SalomonBottomBarItem(
-      icon: const Icon(EvaIcons.homeOutline, size: 26.0,),
-      title: const Text(''),
-      activeIcon: const Icon(EvaIcons.home , size: 28.0,),
-    ),
-
-    SalomonBottomBarItem(
-      icon: const Icon(EvaIcons.messageCircleOutline, size: 26.0,),
-      title: const Text(''),
-      activeIcon:  const Icon(EvaIcons.messageCircle , size: 28.0,),
-    ),
-
-    SalomonBottomBarItem(
-      icon: const Icon(Icons.add_circle_rounded, size: 35.0,),
-      title: const Text(''),
-    ),
-
-    SalomonBottomBarItem(
-      icon: const Icon(EvaIcons.peopleOutline, size: 26.0,),
-      title: const Text(''),
-      activeIcon: const Icon(EvaIcons.people, size: 28.0,)
-    ),
-
-    SalomonBottomBarItem(
-      icon: const Icon(EvaIcons.settingsOutline, size: 26.0,),
-      title: const Text(''),
-      activeIcon: const Icon(EvaIcons.settings, size: 28.0,),
-    ),
-
-  ];
+  // List<SalomonBottomBarItem> items = [
+  //   SalomonBottomBarItem(
+  //     icon: const Icon(EvaIcons.homeOutline, size: 26.0,),
+  //     title: const Text(''),
+  //     activeIcon: const Icon(EvaIcons.home , size: 28.0,),
+  //   ),
+  //
+  //   SalomonBottomBarItem(
+  //     icon: const Icon(EvaIcons.messageCircleOutline, size: 26.0,),
+  //     title: const Text(''),
+  //     activeIcon:  const Icon(EvaIcons.messageCircle , size: 28.0,),
+  //   ),
+  //
+  //   SalomonBottomBarItem(
+  //     icon: const Icon(Icons.add_circle_rounded, size: 35.0,),
+  //     title: const Text(''),
+  //   ),
+  //
+  //   SalomonBottomBarItem(
+  //     icon: const Icon(EvaIcons.peopleOutline, size: 26.0,),
+  //     title: const Text(''),
+  //     activeIcon: const Icon(EvaIcons.people, size: 28.0,)
+  //   ),
+  //
+  //   SalomonBottomBarItem(
+  //     icon: const Icon(EvaIcons.settingsOutline, size: 26.0,),
+  //     title: const Text(''),
+  //     activeIcon: const Icon(EvaIcons.settings, size: 28.0,),
+  //   ),
+  //
+  // ];
 
   List<Widget> screens = [
     const HomeScreen(),
@@ -87,21 +85,32 @@ class AppCubit extends Cubit<AppStates> {
 
   UserModel? userProfile;
 
+  int numberNotice = 0;
+
   void getUserProfile() {
 
     emit(LoadingGetUserProfileAppState());
 
-    FirebaseFirestore.instance.collection('users').doc(uId).get().then((value) {
+    FirebaseFirestore.instance.collection('users').doc(uId).snapshots().listen((value) {
 
       userProfile = UserModel.fromJson(value.data()!);
 
+      numberNotice = 0;
+
+      if((userProfile?.senders)!.isNotEmpty) {
+
+        for(var element in userProfile!.senders!.values) {
+
+          if(element == true) {
+            numberNotice++;
+          }
+
+        }
+
+      }
+
       emit(SuccessGetUserProfileAppState());
 
-    }).catchError((error) {
-      if (kDebugMode) {
-        print('${error.toString()} --> in get profile user');
-      }
-      emit(ErrorGetUserProfileAppState(error));
     });
   }
 
@@ -654,13 +663,27 @@ class AppCubit extends Cubit<AppStates> {
 
 
   void likePost({
+    required String userName,
+    required String imageProfile,
+    required String imageCover,
+    required String email,
+    required String phone,
+    required String bio,
     required String postId,
 }) {
 
     emit(LoadingLikePostAppState());
-    FirebaseFirestore.instance.collection('posts').doc(postId).collection('likes').doc(uId).set({
-      'like': true,
-    }).then((value) {
+
+    UserModel model = UserModel(
+      userName: userName,
+      imageProfile: imageProfile,
+      imageCover: imageCover,
+      email: email,
+      phone: phone,
+      bio: bio,
+    );
+
+    FirebaseFirestore.instance.collection('posts').doc(postId).collection('likes').doc(uId).set(model.toMap()).then((value) {
 
       FirebaseFirestore.instance.collection('posts').doc(postId).update({'like': true});
 
@@ -672,6 +695,40 @@ class AppCubit extends Cubit<AppStates> {
 
   }
 
+
+
+  List<UserModel> usersLikes = [];
+
+  void getUsersLikes ({
+    required String postId,
+}) {
+
+    emit(LoadingGetUsersLikesAppState());
+    FirebaseFirestore.instance.collection('posts').doc(postId).collection('likes').orderBy('user_name').snapshots().listen((event) {
+
+      usersLikes = [];
+
+      for(var element in event.docs) {
+
+        usersLikes.add(UserModel.fromJson(element.data()));
+
+        if((element.id == uId) &&
+            ((element.data()['image_profile'] != userProfile?.imageProfile) ||
+                (element.data()['user_name'] != userProfile?.userName))) {
+
+          FirebaseFirestore.instance.collection('posts').doc(postId).collection('likes').doc(uId).update({
+            'user_name': userProfile?.userName,
+            'image_profile': userProfile?.imageProfile,
+          });
+
+        }
+
+      }
+
+      emit(SuccessGetUsersLikesAppState());
+    });
+
+  }
 
 
   void dislikePost({
@@ -694,8 +751,8 @@ class AppCubit extends Cubit<AppStates> {
 
   List<UserModel> allUsers = [];
 
-
   void getAllUsers() {
+
     emit(LoadingGetAllUsersAppState());
     FirebaseFirestore.instance.collection('users').snapshots().listen((event) {
 
@@ -706,14 +763,31 @@ class AppCubit extends Cubit<AppStates> {
         if(element.data()['uId'] != uId) {
 
           allUsers.add(UserModel.fromJson(element.data()));
+
         }
+
       }
 
       emit(SuccessGetAllUsersAppState());
     });
 
+    // FirebaseFirestore.instance.collection('users').doc(uId).collection('chats').get().then((event) {
+    //
+    //   if (kDebugMode) {
+    //     print(event.docs);
+    //   }
+    //
+    //  for(var element in event.docs) {
+    //
+    //    if (kDebugMode) {
+    //      print(element.id);
+    //    }
+    //  }
+    //
+    // });
 
   }
+
 
 
   List<UserModel> searchUsers = [];
@@ -827,6 +901,12 @@ class AppCubit extends Cubit<AppStates> {
     FirebaseFirestore.instance.collection('users').doc(uId).collection('chats')
         .doc(receiverId).collection('messages').add(model.toMap()).then((value) {
 
+      FirebaseFirestore.instance.collection('users').doc(uId).update({
+         'senders' : {
+           receiverId: false,
+         },
+      });
+
           emit(SuccessSendMessageAppState());
     }).catchError((error) {
 
@@ -836,6 +916,12 @@ class AppCubit extends Cubit<AppStates> {
 
     FirebaseFirestore.instance.collection('users').doc(receiverId).collection('chats')
         .doc(uId).collection('messages').add(model.toMap()).then((value) {
+
+      FirebaseFirestore.instance.collection('users').doc(receiverId).update({
+        'senders' : {
+          uId: true,
+        },
+      });
 
       emit(SuccessSendMessageAppState());
     }).catchError((error) {
@@ -862,6 +948,7 @@ class AppCubit extends Cubit<AppStates> {
       messagesId = [];
       messages = [];
 
+
       for(var element in event.docs) {
 
         messagesId.add(element.id);
@@ -869,6 +956,14 @@ class AppCubit extends Cubit<AppStates> {
         messages.add(MessageModel.fromJson(element.data()));
 
       }
+
+      FirebaseFirestore.instance.collection('users').doc(uId).update({
+        'senders' : {
+          receiverId: false,
+        },
+      });
+
+      numberNotice--;
 
       emit(SuccessGetMessagesAppState());
     });

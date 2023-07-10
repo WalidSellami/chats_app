@@ -87,6 +87,9 @@ class _UserChatScreenState extends State<UserChatScreen> {
                   Navigator.pop(context);
                   AppCubit.get(context).clearImageMessage();
                 }
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  scrollBottom();
+                });
                 setState(() {
                   isVisible = false;
                 });
@@ -101,11 +104,6 @@ class _UserChatScreenState extends State<UserChatScreen> {
                 });
               }
 
-              if (state is SuccessSendMessageAppState) {
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  scrollBottom();
-                });
-              }
             },
             builder: (context, state) {
               var cubit = AppCubit.get(context);
@@ -116,6 +114,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                 appBar: defaultAppBar(
                   onPress: () {
                     // cubit.clearMessages();
+                    cubit.getAllUsers();
                     Navigator.pop(context);
                   },
                   text: '${widget.user.userName}',
@@ -134,8 +133,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                       controller: scrollController,
                                       itemBuilder: (context, index) {
                                         if (messages[index].senderId == uId) {
-                                          if (messages[index].messageImage !=
-                                              '') {
+                                          if (messages[index].messageImage != '') {
                                             return buildItemUserSenderMessageWithImage(
                                                 messages[index],
                                                 messageId[index],
@@ -341,29 +339,35 @@ class _UserChatScreenState extends State<UserChatScreen> {
                               width: 8.0,
                             ),
                             Expanded(
-                              child: TextFormField(
-                                controller: messageController,
-                                keyboardType: TextInputType.text,
-                                focusNode: focusNode,
-                                decoration: InputDecoration(
-                                  hintText: 'Write a message ...',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(
-                                      30.0,
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                  maxHeight: 120.0,
+                                ),
+                                child: TextFormField(
+                                  controller: messageController,
+                                  keyboardType: TextInputType.multiline,
+                                  maxLines: null,
+                                  focusNode: focusNode,
+                                  decoration: InputDecoration(
+                                    hintText: 'Write a message ...',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(
+                                        30.0,
+                                      ),
                                     ),
                                   ),
+                                  onChanged: (value) {
+                                    if (value.isNotEmpty) {
+                                      setState(() {
+                                        isVisible = true;
+                                      });
+                                    } else {
+                                      setState(() {
+                                        isVisible = false;
+                                      });
+                                    }
+                                  },
                                 ),
-                                onChanged: (value) {
-                                  if (value.isNotEmpty) {
-                                    setState(() {
-                                      isVisible = true;
-                                    });
-                                  } else {
-                                    setState(() {
-                                      isVisible = false;
-                                    });
-                                  }
-                                },
                               ),
                             ),
                             const SizedBox(
@@ -473,13 +477,13 @@ class _UserChatScreenState extends State<UserChatScreen> {
               color: Theme.of(context).colorScheme.primary,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(
-                  6.0,
+                  14.0,
                 ),
                 topRight: Radius.circular(
-                  6.0,
+                  14.0,
                 ),
                 bottomLeft: Radius.circular(
-                  6.0,
+                  14.0,
                 ),
               ),
             ),
@@ -515,13 +519,13 @@ class _UserChatScreenState extends State<UserChatScreen> {
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(
-                        6.0,
+                        14.0,
                       ),
                       topRight: Radius.circular(
-                        6.0,
+                        14.0,
                       ),
                       bottomLeft: Radius.circular(
-                        6.0,
+                        14.0,
                       ),
                     ),
                     border: Border.all(
@@ -598,13 +602,13 @@ class _UserChatScreenState extends State<UserChatScreen> {
                   color: Theme.of(context).colorScheme.primary,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(
-                      8.0,
+                      14.0,
                     ),
                     topRight: Radius.circular(
-                      8.0,
+                      14.0,
                     ),
                     bottomLeft: Radius.circular(
-                      8.0,
+                      14.0,
                     ),
                   ),
                 ),
@@ -636,13 +640,13 @@ class _UserChatScreenState extends State<UserChatScreen> {
               color: Colors.grey.shade700,
               borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(
-                  6.0,
+                  14.0,
                 ),
                 topRight: Radius.circular(
-                  6.0,
+                  14.0,
                 ),
                 bottomRight: Radius.circular(
-                  6.0,
+                  14.0,
                 ),
               ),
             ),
@@ -678,13 +682,13 @@ class _UserChatScreenState extends State<UserChatScreen> {
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(
-                        6.0,
+                        14.0,
                       ),
                       topRight: Radius.circular(
-                        6.0,
+                        14.0,
                       ),
                       bottomRight: Radius.circular(
-                        6.0,
+                        14.0,
                       ),
                     ),
                     border: Border.all(
@@ -761,13 +765,13 @@ class _UserChatScreenState extends State<UserChatScreen> {
                   color: Colors.grey.shade700,
                   borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(
-                      6.0,
+                      14.0,
                     ),
                     topRight: Radius.circular(
-                      6.0,
+                      14.0,
                     ),
                     bottomRight: Radius.circular(
-                      6.0,
+                      14.0,
                     ),
                   ),
                 ),

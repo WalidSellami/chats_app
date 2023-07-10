@@ -107,6 +107,7 @@ class LoginCubit extends Cubit<LoginStates> {
       imageProfile: imageProfile ??
           'https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.webp',
       imageCover: 'https://img.freepik.com/free-photo/abstract-textured-backgound_1258-30555.jpg',
+      senders: {},
       deviceToken: deviceToken,
     );
 

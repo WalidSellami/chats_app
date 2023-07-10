@@ -24,15 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    // Future.delayed(const Duration(milliseconds: 700)).then((value) {
-    //
-    //   setState(() {
-    //     isVisible = true;
-    //   });
-    //
-    // });
-
-    Future.delayed(const Duration(milliseconds: 2200)).then((value) {
+    Future.delayed(const Duration(milliseconds: 2000)).then((value) {
       if(CheckCubit.get(context).hasInternet == true) {
         navigateAndNotReturn(context: context, screen: widget.startWidget);
         CheckCubit.get(context).changeScreen();
@@ -53,20 +45,17 @@ class _SplashScreenState extends State<SplashScreen> {
                 isAnimate = false;
               });
             });
-
           }
         }
       },
       builder: (context , state) {
-
-
         return Scaffold(
           appBar: AppBar(),
           body: Center(
             child: AvatarGlow(
               glowColor: Theme.of(context).colorScheme.primary,
               endRadius: 150.0,
-              duration: const Duration(milliseconds: 1300),
+              duration: const Duration(milliseconds: 1400),
               repeat: true,
               curve: Curves.easeOut,
               animate: isAnimate,
@@ -114,18 +103,6 @@ dynamic showAlertConnection(BuildContext context) {
             ),
           ),
           actions: [
-            // TextButton(
-            //   onPressed: () {
-            //     Navigator.pop(context);
-            //   },
-            //   child: const Text(
-            //     'No',
-            //     style: TextStyle(
-            //       fontSize: 16.0,
-            //       fontWeight: FontWeight.bold,
-            //     ),
-            //   ),
-            // ),
             TextButton(
               onPressed: () {
                 SystemNavigator.pop();

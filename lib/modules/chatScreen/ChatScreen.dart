@@ -41,6 +41,7 @@ class _ChatScreenState extends State<ChatScreen> {
               builder: (context , state) {
 
                 var cubit = AppCubit.get(context);
+                var userProfile = cubit.userProfile;
                 var users = cubit.allUsers;
 
                 return Scaffold(
@@ -81,7 +82,9 @@ class _ChatScreenState extends State<ChatScreen> {
                               return Future<void>.delayed(const Duration(seconds: 2));
                             },
                             child: ListView.separated(
-                              itemBuilder: (context , index) => buildItemUser(users[index] , context),
+                              itemBuilder: (context , index) {
+                                return buildItemUser(users[index] , userProfile , context);
+                              },
                               separatorBuilder: (context , index) => Padding(
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: 20.0,
@@ -134,42 +137,49 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  Widget buildItemUser(UserModel user , context) => InkWell(
-    onTap: () {
-      Navigator.of(context).push(createSecondRoute(screen: UserChatScreen(user: user)));
-    },
-    child: Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 10.0,
-        horizontal: 12.0,
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 26.0,
-            backgroundColor: Theme.of(context).colorScheme.primary,
-            backgroundImage: NetworkImage('${user.imageProfile}'),
+  Widget buildItemUser(UserModel user , UserModel? userProfile , context) => InkWell(
+        onTap: () {
+          Navigator.of(context).push(createSecondRoute(screen: UserChatScreen(user: user)));
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: 10.0,
+            horizontal: 16.0,
           ),
-          const SizedBox(
-            width: 20.0,
-          ),
-          Expanded(
-            child: Text(
-              '${user.userName}',
-              maxLines: 1,
-              style: const TextStyle(
-                fontSize: 17.0,
-                overflow: TextOverflow.ellipsis,
-                fontWeight: FontWeight.bold,
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 26.0,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                backgroundImage: NetworkImage('${user.imageProfile}'),
               ),
-            ),
+              const SizedBox(
+                width: 20.0,
+              ),
+              Expanded(
+                child: Text(
+                  '${user.userName}',
+                  maxLines: 1,
+                  style: const TextStyle(
+                    fontSize: 17.0,
+                    overflow: TextOverflow.ellipsis,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              ((userProfile?.senders?[user.uId] == true)) ? CircleAvatar(
+                radius: 4.0,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ) : Container(),
+              const SizedBox(
+                width: 30.0,
+              ),
+              const Icon(
+                Icons.arrow_forward_ios_outlined,
+                size: 18.0,
+              ),
+            ],
           ),
-          const Icon(
-            Icons.arrow_forward_ios_outlined,
-            size: 18.0,
-          ),
-        ],
-      ),
-    ),
-  );
+        ),
+      );
 }

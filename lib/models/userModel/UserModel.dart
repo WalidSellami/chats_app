@@ -6,6 +6,7 @@ class UserModel {
   String? bio;
   String? imageCover;
   String? imageProfile;
+  Map? senders;
   String? deviceToken;
 
   UserModel({
@@ -16,6 +17,7 @@ class UserModel {
     this.bio,
     this.imageCover,
     this.imageProfile,
+    this.senders,
     this.deviceToken,
   });
 
@@ -27,6 +29,7 @@ class UserModel {
         bio = json['bio'];
         imageCover = json['image_cover'];
         imageProfile = json['image_profile'];
+        senders = json['senders'];
         deviceToken = json['device_token'];
       }
 
@@ -39,6 +42,7 @@ class UserModel {
       'bio': bio,
       'image_cover': imageCover,
       'image_profile': imageProfile,
+      'senders': senders,
       'device_token' : deviceToken,
     };
   }
