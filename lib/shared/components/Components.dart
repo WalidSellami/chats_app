@@ -1,12 +1,16 @@
 import 'dart:io';
-
+import 'dart:ui' as ui;
 import 'package:chat/shared/adaptive/circularIndicator/CircularIndicator.dart';
 import 'package:chat/shared/adaptive/circularIndicator/CircularRingIndicator.dart';
 import 'package:chat/shared/components/Constants.dart';
 import 'package:chat/shared/cubit/themeCubit/ThemeCubit.dart';
+import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:hexcolor/hexcolor.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:image_picker/image_picker.dart';
 
 navigateTo({required BuildContext context, required Widget screen}) =>
@@ -232,6 +236,9 @@ dynamic showLoading(BuildContext context) {
       });
 }
 
+
+
+
 dynamic showImage(BuildContext context , String tag , image , {XFile? imageUpload}) {
 
   return navigateTo(context: context, screen: Scaffold(
@@ -284,6 +291,114 @@ dynamic showImage(BuildContext context , String tag , image , {XFile? imageUploa
               height: 450.0,
               fit: BoxFit.fitWidth,
             ),
+          ),
+        ),
+      ),
+    ),
+  ),
+  );
+}
+
+
+
+Future<void> saveImage(GlobalKey globalKey , context) async {
+
+  double devicePixelRatio = MediaQuery
+      .of(context)
+      .devicePixelRatio;
+
+  await Future.delayed(const Duration(milliseconds: 300)).then((value) async {
+
+    RenderRepaintBoundary boundary = globalKey.currentContext?.findRenderObject() as RenderRepaintBoundary;
+
+    ui.Image? image = await boundary.toImage(pixelRatio: devicePixelRatio);
+
+    ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+
+    Uint8List? pngBytes = byteData?.buffer.asUint8List();
+
+    // Save the image to the device's gallery
+    await ImageGallerySaver.saveImage(pngBytes!);
+
+
+  });
+
+
+}
+
+
+
+dynamic showFullImageAndSave(BuildContext context , globalKey , String tag , image) {
+
+  return navigateTo(context: context, screen: Scaffold(
+    appBar: defaultAppBar(
+      onPress: () {
+        Navigator.pop(context);
+      },
+      actions: [
+        IconButton(
+          onPressed: () async {
+            await saveImage(globalKey , context).then((value) {
+              Navigator.pop(context);
+              showFlutterToast(message: 'The image has been saved to your gallery', state: ToastStates.success, context: context);
+            }).catchError((error) {
+              showFlutterToast(message: '$error', state: ToastStates.error, context: context);
+            });
+          },
+          icon: Icon(
+            EvaIcons.downloadOutline,
+            color: Theme.of(context).colorScheme.primary,
+          ),
+          tooltip: 'Save',
+        ),
+        const SizedBox(
+          width: 6.0,
+        ),
+      ],
+    ),
+    body: Center(
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pop(context);
+        },
+        child: RepaintBoundary(
+          key: globalKey,
+          child: Hero(
+            tag: tag,
+            child: Container(
+              decoration: const BoxDecoration(),
+              child: Image.network('$image',
+                width: double.infinity,
+                height: 450.0,
+                fit: BoxFit.fitWidth,
+                frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                  return child;
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+                  if(loadingProgress == null) {
+                    return child;
+                  } else {
+                    return Container(
+                      width: double.infinity,
+                      height: 450.0,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          width: 0.0,
+                          color: Colors.grey.shade900,
+                        ),
+                      ),
+                      child: Center(child: CircularRingIndicator(os: getOs())),
+                    );
+                  }
+                },
+                errorBuilder: (context, error, stackTrace) {
+                  return const SizedBox(
+                    width: double.infinity,
+                    height: 450.0,
+                    child: Center(child:Text('Failed to load' , style: TextStyle(fontSize: 14.0,),)),
+                  );
+                },
+              ),),
           ),
         ),
       ),

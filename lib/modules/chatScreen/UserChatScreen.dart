@@ -40,6 +40,9 @@ class _UserChatScreenState extends State<UserChatScreen> {
 
   late ScrollController scrollController;
 
+  GlobalKey globalKey = GlobalKey();
+
+
   void scrollBottom() {
     if(scrollController.hasClients) {
       scrollController.animateTo(
@@ -114,7 +117,6 @@ class _UserChatScreenState extends State<UserChatScreen> {
                 appBar: defaultAppBar(
                   onPress: () {
                     // cubit.clearMessages();
-                    cubit.getAllUsers();
                     Navigator.pop(context);
                   },
                   text: '${widget.user.userName}',
@@ -511,7 +513,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
           children: [
             GestureDetector(
               onTap: () {
-                showImage(context, index.toString(), model.messageImage);
+                showFullImageAndSave(context, globalKey, index.toString(), model.messageImage);
               },
               child: Hero(
                 tag: index.toString(),
@@ -674,7 +676,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
           children: [
             GestureDetector(
               onTap: () {
-                showImage(context, index.toString(), model.messageImage);
+                showFullImageAndSave(context, globalKey , index.toString(), model.messageImage);
               },
               child: Hero(
                 tag: index.toString(),

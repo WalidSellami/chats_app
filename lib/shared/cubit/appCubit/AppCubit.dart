@@ -771,20 +771,6 @@ class AppCubit extends Cubit<AppStates> {
       emit(SuccessGetAllUsersAppState());
     });
 
-    // FirebaseFirestore.instance.collection('users').doc(uId).collection('chats').get().then((event) {
-    //
-    //   if (kDebugMode) {
-    //     print(event.docs);
-    //   }
-    //
-    //  for(var element in event.docs) {
-    //
-    //    if (kDebugMode) {
-    //      print(element.id);
-    //    }
-    //  }
-    //
-    // });
 
   }
 

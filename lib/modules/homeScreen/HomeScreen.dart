@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'package:chat/models/postModel/PostModel.dart';
 import 'package:chat/models/userModel/UserModel.dart';
 import 'package:chat/modules/commentScreen/CommentsScreen.dart';
@@ -28,6 +29,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final GlobalKey<RefreshIndicatorState> refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
+
+  GlobalKey globalKey = GlobalKey();
 
   @override
   void initState() {
@@ -226,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if(post.imagePost != '')
           GestureDetector(
             onTap: () {
-              showImage(context, 'image', post.imagePost);
+              showFullImageAndSave(context, globalKey , 'image', post.imagePost);
             },
             child: Hero(
               tag: 'image',
@@ -432,30 +435,6 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ),
-              // InkWell(
-              //   borderRadius: BorderRadius.circular(4.0),
-              //   onTap: () {
-              //
-              //   },
-              //   child: Padding(
-              //     padding: const EdgeInsets.all(5.0),
-              //     child: Row(
-              //       children: [
-              //         Icon(
-              //           EvaIcons.downloadOutline,
-              //           size: 19.0,
-              //           color: Colors.blue.shade700,
-              //         ),
-              //         const Text(
-              //           ' Save',
-              //           style: TextStyle(
-              //             fontSize: 13.0,
-              //           ),
-              //         ),
-              //       ],
-              //     ),
-              //   ),
-              // ),
             ],
           ),
         ],
@@ -463,50 +442,5 @@ class _HomeScreenState extends State<HomeScreen> {
     ),
   );
 
-  // dynamic showAlert(BuildContext context , postId , postImage) {
-  //   return showDialog(
-  //     context: context,
-  //     builder: (context) {
-  //       return AlertDialog(
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(14.0,),
-  //         ),
-  //         title: const Text(
-  //           'Do you want to remove this post ?',
-  //           textAlign: TextAlign.center,
-  //           style: TextStyle(
-  //             fontSize: 18.0,
-  //             fontWeight: FontWeight.bold,
-  //           ),
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () {
-  //               Navigator.pop(context);
-  //             },
-  //             child: const Text(
-  //               'No',
-  //               style: TextStyle(
-  //                 fontSize: 16.0,
-  //                 fontWeight: FontWeight.bold,
-  //               ),
-  //             ),
-  //           ),
-  //           TextButton(
-  //             onPressed: () {
-  //             },
-  //             child: Text(
-  //               'Yes',
-  //               style: TextStyle(
-  //                 color: HexColor('f9325f'),
-  //                 fontSize: 16.0,
-  //                 fontWeight: FontWeight.bold,
-  //               ),
-  //             ),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
+
 }
