@@ -1,4 +1,3 @@
-import 'dart:ui' as ui;
 import 'package:chat/models/postModel/PostModel.dart';
 import 'package:chat/models/userModel/UserModel.dart';
 import 'package:chat/modules/commentScreen/CommentsScreen.dart';
