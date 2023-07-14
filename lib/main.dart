@@ -2,9 +2,11 @@ import 'package:chat/layout/appLayout/AppLayout.dart';
 import 'package:chat/models/dataModel/DataModel.dart';
 import 'package:chat/modules/startup/loginScreen/LoginScreen.dart';
 import 'package:chat/modules/startup/splashScreen/SplashScreen.dart';
+import 'package:chat/modules/startup/userAccountsScreen/UserAccountsScreen.dart';
 import 'package:chat/shared/components/Constants.dart';
 import 'package:chat/shared/cubit/appCubit/AppCubit.dart';
 import 'package:chat/shared/cubit/checkCubit/CheckCubit.dart';
+import 'package:chat/shared/cubit/loginCubit/LoginCubit.dart';
 import 'package:chat/shared/cubit/themeCubit/ThemeCubit.dart';
 import 'package:chat/shared/cubit/themeCubit/ThemeStates.dart';
 import 'package:chat/shared/network/local/CacheHelper.dart';
@@ -77,6 +79,7 @@ Future<void> main() async {
   await CacheHelper.init();
 
   uId = CacheHelper.getData(key: 'uId');
+  isSaved = CacheHelper.getData(key: 'isSaved');
   var isDark = CacheHelper.getData(key: 'isDark');
 
 
@@ -85,6 +88,8 @@ Future<void> main() async {
 
   if(uId != null) {
     widget = const AppLayout();
+  } else if(isSaved != null) {
+    widget = const UserAccountsScreen();
   } else {
     widget = const LoginScreen();
   }
@@ -105,7 +110,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (BuildContext context) => AppCubit()),
+        BlocProvider(create: (BuildContext context) => AppCubit()..getUserProfile()),
+        BlocProvider(create: (BuildContext context) => LoginCubit()),
         BlocProvider(create: (BuildContext context) => CheckCubit()..checkConnection(context)),
         BlocProvider(create: (BuildContext context) => ThemeCubit()..changeMode(isDark ?? false),
         ),

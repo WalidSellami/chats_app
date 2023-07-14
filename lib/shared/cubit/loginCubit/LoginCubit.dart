@@ -3,6 +3,7 @@ import 'package:bloc/bloc.dart';
 import 'package:chat/models/userModel/UserModel.dart';
 import 'package:chat/shared/components/Constants.dart';
 import 'package:chat/shared/cubit/loginCubit/LoginStates.dart';
+import 'package:chat/shared/network/local/CacheHelper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -33,6 +34,8 @@ class LoginCubit extends Cubit<LoginStates> {
          FirebaseFirestore.instance.collection('users').doc(value.user?.uid).update({
            'device_token': deviceToken,
          });
+
+         CacheHelper.saveData(key: 'isGoogleSignIn', value: false);
 
         emit(SuccessLoginState(value.user?.uid));
 
@@ -78,6 +81,9 @@ class LoginCubit extends Cubit<LoginStates> {
       FirebaseFirestore.instance.collection('users').doc(value.user?.uid).update({
         'device_token': deviceToken,
       });
+
+      CacheHelper.saveData(key: 'isGoogleSignIn', value: true);
+
 
       // emit(SuccessGoogleLoginState(value.user?.uid));
 

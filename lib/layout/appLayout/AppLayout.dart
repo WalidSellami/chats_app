@@ -51,8 +51,7 @@ class AppLayout extends StatelessWidget {
                 return WillPopScope(
                   onWillPop: () async {
                     final difference = DateTime.now().difference(timePressed);
-                    final isWarning =
-                        difference >= const Duration(milliseconds: 800);
+                    final isWarning = difference >= const Duration(milliseconds: 800);
                     timePressed = DateTime.now();
 
                     if (isWarning) {

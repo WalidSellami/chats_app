@@ -9,10 +9,12 @@ import 'package:chat/modules/chatScreen/ChatScreen.dart';
 import 'package:chat/modules/homeScreen/HomeScreen.dart';
 import 'package:chat/modules/postScreen/PostScreen.dart';
 import 'package:chat/modules/settingsScreen/SettingsScreen.dart';
+import 'package:chat/modules/startup/loginScreen/LoginScreen.dart';
 import 'package:chat/modules/usersScreen/UsersScreen.dart';
 import 'package:chat/shared/components/Components.dart';
 import 'package:chat/shared/components/Constants.dart';
 import 'package:chat/shared/cubit/appCubit/AppStates.dart';
+import 'package:chat/shared/network/local/CacheHelper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
@@ -1001,6 +1003,96 @@ class AppCubit extends Cubit<AppStates> {
     });
 
   }
+
+
+
+  void saveUserAccount({
+    required String userName,
+    required String email,
+    required String imageProfile,
+}) async {
+
+    emit(LoadingSaveUserAccountAppState());
+
+    var deviceToken = await getDeviceToken();
+
+    bool isGoogleSignIn = CacheHelper.getData(key: 'isGoogleSignIn');
+
+    FirebaseFirestore.instance.collection('saved').doc(uId).set({
+      'user_name': userName,
+      'email': email,
+      'image_profile': imageProfile,
+      'isGoogleSignIn': isGoogleSignIn,
+      'device_token': deviceToken,
+    }).then((value) {
+
+      emit(SuccessSaveUserAccountAppState());
+    }).catchError((error) {
+      if (kDebugMode) {
+        print('${error.toString()} --> in save user account');
+      }
+      emit(ErrorSaveUserAccountAppState(error));
+    });
+
+  }
+
+
+
+  List<String> accountsSavedId = [];
+  List<dynamic> accountsSaved = [];
+
+  void getUserAccounts(context) async {
+
+    emit(LoadingGetUserAccountsAppState());
+
+    var deviceToken = await getDeviceToken();
+
+    FirebaseFirestore.instance.collection('saved').snapshots().listen((value) {
+
+      accountsSavedId = [];
+      accountsSaved = [];
+
+      for(var element in value.docs) {
+
+        if(element.data()['device_token'] == deviceToken) {
+
+          accountsSavedId.add(element.id);
+          accountsSaved.add(element.data());
+
+        }
+
+      }
+
+      if(accountsSaved.isEmpty) {
+        CacheHelper.removeData(key: 'isSaved');
+        navigateAndNotReturn(context: context, screen: const LoginScreen());
+      }
+
+      emit(SuccessGetUserAccountsAppState());
+    });
+
+
+  }
+
+
+  void deleteUserAccount({
+    required String userAccountId,
+}) async {
+
+    emit(LoadingDeleteUserAccountAppState());
+
+    FirebaseFirestore.instance.collection('saved').doc(userAccountId).delete().then((value) {
+
+      emit(SuccessDeleteUserAccountAppState());
+    }).catchError((error) {
+
+      emit(ErrorDeleteUserAccountAppState(error));
+    });
+
+
+  }
+
+
 
 
 

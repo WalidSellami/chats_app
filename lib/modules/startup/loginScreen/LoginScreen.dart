@@ -45,6 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
     passwordController.addListener(() {
       setState(() {});
     });
+    isSaved = CacheHelper.getData(key: 'isSaved');
   }
 
 
@@ -75,9 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
             var themeCubit = ThemeCubit.get(context);
 
-            return BlocProvider(
-              create: (BuildContext context) => LoginCubit(),
-              child: BlocConsumer<LoginCubit , LoginStates>(
+            return BlocConsumer<LoginCubit , LoginStates>(
                 listener: (context , state) {
                   if(state is ErrorLoginState) {
                     showFlutterToast(message: '${state.error}', state: ToastStates.error, context: context);
@@ -118,11 +117,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   return WillPopScope(
                     onWillPop: () async {
-                      showAlert(context);
+                      if(isSaved == null) {
+                        showAlert(context);
+                      }
                       return true;
                     },
                     child: Scaffold(
-                      appBar: AppBar(),
+                      appBar: AppBar(
+                        leading: (isSaved != null) ? IconButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            icon: const Icon(
+                              Icons.arrow_back_ios_new_outlined,
+                            ),
+                        ) : null,
+                      ),
                       body: Center(
                         child: SingleChildScrollView(
                           child: Padding(
@@ -335,9 +345,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   );
                 },
-              ),
-            );
-
+              );
           },
         );
       },

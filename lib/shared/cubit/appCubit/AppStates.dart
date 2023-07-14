@@ -289,7 +289,46 @@ class LoadingGetUsersLikesAppState extends AppStates {}
 class SuccessGetUsersLikesAppState extends AppStates {}
 
 
+// Get Number Notifications
 class SuccessGetNumberNoticeAppState extends AppStates {}
+
+
+
+// Save User Account
+class LoadingSaveUserAccountAppState extends AppStates {}
+
+class SuccessSaveUserAccountAppState extends AppStates {}
+
+class ErrorSaveUserAccountAppState extends AppStates {
+  dynamic error;
+  ErrorSaveUserAccountAppState(this.error);
+}
+
+
+// Get User Accounts
+class LoadingGetUserAccountsAppState extends AppStates {}
+
+class SuccessGetUserAccountsAppState extends AppStates {}
+
+class ErrorGetUserAccountsAppState extends AppStates {
+  dynamic error;
+  ErrorGetUserAccountsAppState(this.error);
+}
+
+
+
+// Delete User Accounts
+class LoadingDeleteUserAccountAppState extends AppStates {}
+
+class SuccessDeleteUserAccountAppState extends AppStates {}
+
+class ErrorDeleteUserAccountAppState extends AppStates {
+  dynamic error;
+  ErrorDeleteUserAccountAppState(this.error);
+}
+
+
+
 
 // Send Notification
 class SuccessSendNotificationAppState extends AppStates {}

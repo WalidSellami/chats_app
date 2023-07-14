@@ -9,6 +9,8 @@ String getOs() {
 
 dynamic uId;
 
+bool? isSaved;
+
 
 Future<String?> getDeviceToken() async {
 

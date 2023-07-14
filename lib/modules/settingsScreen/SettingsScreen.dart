@@ -1,5 +1,5 @@
 import 'package:chat/modules/editProfileScreen/EditProfileScreen.dart';
-import 'package:chat/modules/startup/loginScreen/LoginScreen.dart';
+import 'package:chat/modules/startup/userAccountsScreen/UserAccountsScreen.dart';
 import 'package:chat/shared/adaptive/circularIndicator/CircularRingIndicator.dart';
 import 'package:chat/shared/components/Components.dart';
 import 'package:chat/shared/components/Constants.dart';
@@ -17,8 +17,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
 
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+class _SettingsScreenState extends State<SettingsScreen> {
+
+
+  @override
+  void initState() {
+    super.initState();
+    isSaved = CacheHelper.getData(key: 'isSaved');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +48,26 @@ class SettingsScreen extends StatelessWidget {
             var themeCubit = ThemeCubit.get(context);
 
             return BlocConsumer<AppCubit , AppStates>(
-              listener: (context , state) {},
+              listener: (context , state) {
+
+                if(state is SuccessSaveUserAccountAppState) {
+
+                  Future.delayed(const Duration(milliseconds: 1600)).then((value) {
+                    FirebaseAuth.instance.signOut();
+                    CacheHelper.removeData(key: 'uId').then((value) {
+                      if(value == true) {
+                        CacheHelper.saveData(key: 'isSaved', value: true);
+                        Navigator.pop(context);
+                        navigateAndNotReturn(context: context, screen: const UserAccountsScreen());
+                        AppCubit.get(context).currentIndex = 0;
+                      }
+                    });
+                  });
+
+
+                }
+
+              },
               builder: (context , state) {
 
                 var cubit = AppCubit.get(context);
@@ -212,7 +244,9 @@ class SettingsScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(4.0,),
                             ),
                             onTap: () {
-                              showAlert(context);
+                              // (isSaved == null) ?
+                              // showAlertSaveData(context , userProfile?.userName , userProfile?.email , userProfile?.imageProfile) :
+                              showAlert(context , userProfile?.userName , userProfile?.email , userProfile?.imageProfile);
                             },
                             leading: Container(
                               padding: const EdgeInsets.all(8.0),
@@ -266,8 +300,67 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  // dynamic showAlertSaveData(BuildContext context , userName , email , imageProfile) {
+  //   return showDialog(
+  //     context: context,
+  //     builder: (dialogContext) {
+  //       return AlertDialog(
+  //         shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(14.0,),
+  //         ),
+  //         title: const Text(
+  //           'Do you want to save your data account to login easily?',
+  //           textAlign: TextAlign.center,
+  //           style: TextStyle(
+  //             fontSize: 18.0,
+  //             height: 1.5,
+  //             fontWeight: FontWeight.bold,
+  //           ),
+  //         ),
+  //         actions: [
+  //           TextButton(
+  //             onPressed: () {
+  //               Navigator.pop(dialogContext);
+  //               showLoading(context);
+  //               Future.delayed(const Duration(seconds: 1)).then((value) {
+  //                 FirebaseAuth.instance.signOut();
+  //                 CacheHelper.removeData(key: 'uId').then((value) {
+  //                   if(value == true) {
+  //                     Navigator.pop(context);
+  //                     navigateAndNotReturn(context: context, screen: const LoginScreen());
+  //                     AppCubit.get(context).currentIndex = 0;
+  //                   }
+  //                 });
+  //               });
+  //             },
+  //             child: const Text(
+  //               'No',
+  //               style: TextStyle(
+  //                 fontSize: 16.0,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //             ),
+  //           ),
+  //           TextButton(
+  //             onPressed: () {
+  //
+  //             },
+  //             child: Text(
+  //               'Yes',
+  //               style: TextStyle(
+  //                 color: HexColor('f9325f'),
+  //                 fontSize: 16.0,
+  //                 fontWeight: FontWeight.bold,
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       );
+  //     },
+  //   );
+  // }
 
-  dynamic showAlert(BuildContext context) {
+  dynamic showAlert(BuildContext context , userName , email , imageProfile) {
     return showDialog(
         context: context,
         builder: (dialogContext) {
@@ -299,16 +392,17 @@ class SettingsScreen extends StatelessWidget {
                  onPressed: () {
                    Navigator.pop(dialogContext);
                    showLoading(context);
-                   Future.delayed(const Duration(seconds: 1)).then((value) {
-                     FirebaseAuth.instance.signOut();
-                     CacheHelper.removeData(key: 'uId').then((value) {
-                       if(value == true) {
-                         Navigator.pop(context);
-                         navigateAndNotReturn(context: context, screen: const LoginScreen());
-                         AppCubit.get(context).currentIndex = 0;
-                       }
-                     });
-                   });
+                   AppCubit.get(context).saveUserAccount(userName: userName, email: email, imageProfile: imageProfile);
+                   // Future.delayed(const Duration(milliseconds: 1800)).then((value) {
+                   //   FirebaseAuth.instance.signOut();
+                   //   CacheHelper.removeData(key: 'uId').then((value) {
+                   //     if(value == true) {
+                   //       Navigator.pop(context);
+                   //       navigateAndNotReturn(context: context, screen: const UserAccountsScreen());
+                   //       AppCubit.get(context).currentIndex = 0;
+                   //     }
+                   //   });
+                   // });
                  },
                  child: Text(
                    'Yes',
@@ -324,6 +418,4 @@ class SettingsScreen extends StatelessWidget {
         },
     );
   }
-
-
 }
