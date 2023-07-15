@@ -96,6 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                   if(state is ErrorGoogleLoginState) {
                     showFlutterToast(message: '${state.error}', state: ToastStates.error, context: context);
+                    Navigator.pop(context);
                   }
 
                   if(state is SuccessUserLoginCreateLoginState) {

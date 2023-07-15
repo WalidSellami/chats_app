@@ -111,6 +111,10 @@ class AppCubit extends Cubit<AppStates> {
 
       }
 
+      if (kDebugMode) {
+        print(numberNotice);
+      }
+
       emit(SuccessGetUserProfileAppState());
 
     });

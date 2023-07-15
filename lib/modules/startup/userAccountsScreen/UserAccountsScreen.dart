@@ -81,12 +81,12 @@ class _UserAccountsScreenState extends State<UserAccountsScreen> {
                           showFlutterToast(message: '${state.error}', state: ToastStates.error, context: context);
                         }
 
-                        if(state is SuccessUserLoginCreateLoginState) {
+                        if(state is SuccessGoogleLoginState) {
                           showFlutterToast(message: 'Login done successfully', state: ToastStates.success, context: context);
 
-                          CacheHelper.saveData(key: 'uId', value: state.model.uId).then((value) {
+                          CacheHelper.saveData(key: 'uId', value: state.uId).then((value) {
 
-                            uId = state.model.uId;
+                            uId = state.uId;
 
                             Navigator.pop(context);
                             navigateAndNotReturn(context: context, screen: const AppLayout());
@@ -232,7 +232,7 @@ class _UserAccountsScreenState extends State<UserAccountsScreen> {
           Navigator.of(context).push(createRoute(screen: UserAccessScreen(email: account['email'], imageProfile: account['image_profile'],)));
         } else {
           showLoading(context);
-          await LoginCubit.get(context).signInWithGoogle();
+          await LoginCubit.get(context).signInWithGoogleAccount();
         }
       } else {
         showFlutterToast(message: 'No Internet Connection', state: ToastStates.error, context: context);
@@ -277,11 +277,11 @@ class _UserAccountsScreenState extends State<UserAccountsScreen> {
               message: 'Remove',
               child: CircleAvatar(
                 radius: 18.0,
-                backgroundColor: Colors.grey.shade200,
-                child: const Icon(
+                backgroundColor: ThemeCubit.get(context).isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                child: Icon(
                   Icons.close_rounded,
                   size: 18.0,
-                  color: Colors.black,
+                  color: ThemeCubit.get(context).isDark ? Colors.white : Colors.black,
                 ),
               ),
             ),
