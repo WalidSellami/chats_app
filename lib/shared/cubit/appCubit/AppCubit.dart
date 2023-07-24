@@ -17,6 +17,7 @@ import 'package:chat/shared/cubit/appCubit/AppStates.dart';
 import 'package:chat/shared/network/local/CacheHelper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -99,7 +100,7 @@ class AppCubit extends Cubit<AppStates> {
 
       numberNotice = 0;
 
-      if((userProfile?.senders)!.isNotEmpty) {
+      if(((userProfile?.senders)?.length ?? 0) > 0) {
 
         for(var element in userProfile!.senders!.values) {
 
@@ -111,9 +112,8 @@ class AppCubit extends Cubit<AppStates> {
 
       }
 
-      if (kDebugMode) {
-        print(numberNotice);
-      }
+      // userProfile?.imageProfile ??= profile;
+      // userProfile?.imageCover ??= cover;
 
       emit(SuccessGetUserProfileAppState());
 
@@ -189,7 +189,7 @@ class AppCubit extends Cubit<AppStates> {
 
     emit(LoadingUploadImageProfileAppState());
 
-    firebase_storage.FirebaseStorage.instance.ref().child('users/${Uri.file(imageProfile!.path).pathSegments.last}')
+    firebase_storage.FirebaseStorage.instance.ref().child('users/$uId/${Uri.file(imageProfile!.path).pathSegments.last}')
         .putFile(File(imageProfile!.path)).then((value) {
 
        value.ref.getDownloadURL().then((value) {
@@ -222,7 +222,7 @@ class AppCubit extends Cubit<AppStates> {
 
     emit(LoadingUploadImageCoverAppState());
 
-    firebase_storage.FirebaseStorage.instance.ref().child('users/${Uri.file(imageCover!.path).pathSegments.last}')
+    firebase_storage.FirebaseStorage.instance.ref().child('users/$uId/${Uri.file(imageCover!.path).pathSegments.last}')
         .putFile(File(imageCover!.path)).then((value) {
 
       value.ref.getDownloadURL().then((value) {
@@ -270,6 +270,7 @@ class AppCubit extends Cubit<AppStates> {
       email: userProfile?.email,
       imageCover: imageCover ?? userProfile?.imageCover,
       imageProfile: imageProfile ?? userProfile?.imageProfile,
+      senders: userProfile?.senders ?? {},
       deviceToken: deviceToken,
     );
 
@@ -277,15 +278,116 @@ class AppCubit extends Cubit<AppStates> {
 
       getUserProfile();
 
-      if(imageProfile != null) {
-        clearImageProfile();
-      } else if(imageCover != null) {
-        clearImageCover();
+    }).catchError((error) {
+
+      emit(ErrorUpdateUserProfileAppState(error));
+    });
+
+  }
+
+
+
+  List<String> allImagesProfileCover = [];
+
+  void getAllImagesProfileCover() {
+
+    emit(LoadingGetAllImagesProfileCoverAppState());
+
+    firebase_storage.FirebaseStorage.instance.ref().child('users/$uId/').listAll().then((value) {
+
+      allImagesProfileCover = [];
+
+      if(value.items.isNotEmpty) {
+        for (var element in value.items) {
+          element.getDownloadURL().then((value) {
+            allImagesProfileCover.add(value);
+
+            emit(SuccessGetAllImagesProfileCoverAppState());
+          }).catchError((error) {
+            if (kDebugMode) {
+              print('${error
+                  .toString()} --> in get image profile (download url).');
+            }
+            emit(ErrorGetAllImagesProfileCoverAppState(error));
+          });
+        }
+      } else {
+        emit(SuccessGetAllImagesProfileCoverAppState());
       }
 
     }).catchError((error) {
 
-      emit(ErrorUpdateUserProfileAppState(error));
+      if (kDebugMode) {
+        print('${error.toString()} --> in get all images profile.');
+      }
+      emit(ErrorGetAllImagesProfileCoverAppState(error));
+
+    });
+
+  }
+
+
+  void clearImagesProfileCover() {
+
+    allImagesProfileCover = [];
+    emit(SuccessClearAppState());
+
+  }
+
+
+  void deleteImageProfileCover(String image) {
+
+    emit(LoadingDeleteImageProfileCoverAppState());
+
+    String fileName = getFileNameFromUrl(image);
+
+    firebase_storage.FirebaseStorage.instance.ref().child('users/$uId/$fileName').delete().then((value) {
+
+      if(userProfile?.imageProfile == image) {
+        FirebaseFirestore.instance.collection('users').doc(uId).update({
+          'image_profile': profile,
+        });
+
+      } else if(userProfile?.imageCover == image) {
+        FirebaseFirestore.instance.collection('users').doc(uId).update({
+          'image_cover': cover,
+        });
+
+      }
+
+      emit(SuccessDeleteImageProfileCoverAppState());
+    }).catchError((error) {
+
+      emit(ErrorDeleteImageProfileCoverAppState(error));
+    });
+
+
+  }
+
+  void changePassword({
+    required String oldPassword,
+    required String newPassword,
+}) async {
+
+    emit(LoadingChangePasswordAppState());
+
+    AuthCredential credential = EmailAuthProvider.credential(
+        email: FirebaseAuth.instance.currentUser?.email ?? '',
+        password: oldPassword);
+
+    await FirebaseAuth.instance.currentUser?.reauthenticateWithCredential(credential).then((value) async {
+
+      await FirebaseAuth.instance.currentUser?.updatePassword(newPassword);
+
+      emit(SuccessChangePasswordAppState());
+
+    }).catchError((error) {
+
+      if(kDebugMode) {
+        print('$error  ---> change password.');
+      }
+
+      emit(ErrorChangePasswordAppState(error));
     });
 
   }
@@ -1069,6 +1171,7 @@ class AppCubit extends Cubit<AppStates> {
 
       if(accountsSaved.isEmpty) {
         CacheHelper.removeData(key: 'isSaved');
+        CacheHelper.removeData(key: 'isGoogleSignIn');
         navigateAndNotReturn(context: context, screen: const LoginScreen());
       }
 

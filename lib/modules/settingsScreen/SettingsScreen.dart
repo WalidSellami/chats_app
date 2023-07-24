@@ -1,4 +1,6 @@
+import 'package:chat/modules/changePasswordScreen/ChangePasswordScreen.dart';
 import 'package:chat/modules/editProfileScreen/EditProfileScreen.dart';
+import 'package:chat/modules/photosScreen/PhotosScreen.dart';
 import 'package:chat/modules/startup/userAccountsScreen/UserAccountsScreen.dart';
 import 'package:chat/shared/adaptive/circularIndicator/CircularRingIndicator.dart';
 import 'package:chat/shared/components/Components.dart';
@@ -26,11 +28,14 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
 
+  bool? isGoogleSignIn;
+
 
   @override
   void initState() {
     super.initState();
     isSaved = CacheHelper.getData(key: 'isSaved');
+    isGoogleSignIn = CacheHelper.getData(key: 'isGoogleSignIn');
   }
 
   @override
@@ -52,7 +57,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                 if(state is SuccessSaveUserAccountAppState) {
 
-                  Future.delayed(const Duration(milliseconds: 1600)).then((value) {
+                  Future.delayed(const Duration(milliseconds: 1500)).then((value) {
                     FirebaseAuth.instance.signOut();
                     CacheHelper.removeData(key: 'uId').then((value) {
                       if(value == true) {
@@ -210,6 +215,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               borderRadius: BorderRadius.circular(4.0,),
                             ),
                             onTap: () {
+                              // cubit.getAllImagesProfileCover();
+                              Navigator.of(context).push(createSecondRoute(screen: const PhotosScreen()));
+                            },
+                            leading: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.0),
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              child: const Icon(
+                                EvaIcons.image,
+                                color: Colors.white,
+                              ),
+                            ),
+                            title: const Text(
+                              'My Photos',
+                              style: TextStyle(
+                                fontSize: 16.5,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            trailing: const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 17.0,
+                            ),
+                          ),
+                          const SizedBox(
+                            height: 20.0,
+                          ),
+                          ListTile(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4.0,),
+                            ),
+                            onTap: () {
                               Navigator.of(context).push(createSecondRoute(screen: const EditProfileScreen()));
                             },
                             leading: Container(
@@ -236,6 +276,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               size: 17.0,
                             ),
                           ),
+                          if(isGoogleSignIn == false)
+                          const SizedBox(
+                            height: 20.0,
+                          ),
+                          if(isGoogleSignIn == false)
+                            ListTile(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(4.0,),
+                            ),
+                            onTap: () {
+                              Navigator.of(context).push(createSecondRoute(screen: const ChangePasswordsScreen()));
+                            },
+                            leading: Container(
+                              padding: const EdgeInsets.all(8.0),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8.0),
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                              clipBehavior: Clip.antiAliasWithSaveLayer,
+                              child: const Icon(
+                                EvaIcons.lockOutline,
+                                color: Colors.white,
+                              ),
+                            ),
+                            title: const Text(
+                              'Change Password',
+                              style: TextStyle(
+                                fontSize: 16.5,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            trailing: const Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              size: 17.0,
+                            ),
+                          ),
                           const SizedBox(
                             height: 20.0,
                           ),
@@ -244,8 +320,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               borderRadius: BorderRadius.circular(4.0,),
                             ),
                             onTap: () {
-                              // (isSaved == null) ?
-                              // showAlertSaveData(context , userProfile?.userName , userProfile?.email , userProfile?.imageProfile) :
                               showAlert(context , userProfile?.userName , userProfile?.email , userProfile?.imageProfile);
                             },
                             leading: Container(
@@ -300,66 +374,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // dynamic showAlertSaveData(BuildContext context , userName , email , imageProfile) {
-  //   return showDialog(
-  //     context: context,
-  //     builder: (dialogContext) {
-  //       return AlertDialog(
-  //         shape: RoundedRectangleBorder(
-  //           borderRadius: BorderRadius.circular(14.0,),
-  //         ),
-  //         title: const Text(
-  //           'Do you want to save your data account to login easily?',
-  //           textAlign: TextAlign.center,
-  //           style: TextStyle(
-  //             fontSize: 18.0,
-  //             height: 1.5,
-  //             fontWeight: FontWeight.bold,
-  //           ),
-  //         ),
-  //         actions: [
-  //           TextButton(
-  //             onPressed: () {
-  //               Navigator.pop(dialogContext);
-  //               showLoading(context);
-  //               Future.delayed(const Duration(seconds: 1)).then((value) {
-  //                 FirebaseAuth.instance.signOut();
-  //                 CacheHelper.removeData(key: 'uId').then((value) {
-  //                   if(value == true) {
-  //                     Navigator.pop(context);
-  //                     navigateAndNotReturn(context: context, screen: const LoginScreen());
-  //                     AppCubit.get(context).currentIndex = 0;
-  //                   }
-  //                 });
-  //               });
-  //             },
-  //             child: const Text(
-  //               'No',
-  //               style: TextStyle(
-  //                 fontSize: 16.0,
-  //                 fontWeight: FontWeight.bold,
-  //               ),
-  //             ),
-  //           ),
-  //           TextButton(
-  //             onPressed: () {
-  //
-  //             },
-  //             child: Text(
-  //               'Yes',
-  //               style: TextStyle(
-  //                 color: HexColor('f9325f'),
-  //                 fontSize: 16.0,
-  //                 fontWeight: FontWeight.bold,
-  //               ),
-  //             ),
-  //           ),
-  //         ],
-  //       );
-  //     },
-  //   );
-  // }
-
   dynamic showAlert(BuildContext context , userName , email , imageProfile) {
     return showDialog(
         context: context,
@@ -393,16 +407,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                    Navigator.pop(dialogContext);
                    showLoading(context);
                    AppCubit.get(context).saveUserAccount(userName: userName, email: email, imageProfile: imageProfile);
-                   // Future.delayed(const Duration(milliseconds: 1800)).then((value) {
-                   //   FirebaseAuth.instance.signOut();
-                   //   CacheHelper.removeData(key: 'uId').then((value) {
-                   //     if(value == true) {
-                   //       Navigator.pop(context);
-                   //       navigateAndNotReturn(context: context, screen: const UserAccountsScreen());
-                   //       AppCubit.get(context).currentIndex = 0;
-                   //     }
-                   //   });
-                   // });
                  },
                  child: Text(
                    'Yes',

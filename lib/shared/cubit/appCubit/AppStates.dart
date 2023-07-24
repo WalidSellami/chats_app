@@ -65,9 +65,40 @@ class ErrorUploadImageCoverAppState extends AppStates {
   ErrorUploadImageCoverAppState(this.error);
 }
 
+// Get Images Profile Cover
+class LoadingGetAllImagesProfileCoverAppState extends AppStates {}
+
+class SuccessGetAllImagesProfileCoverAppState extends AppStates {}
+
+class ErrorGetAllImagesProfileCoverAppState extends AppStates {
+  dynamic error;
+  ErrorGetAllImagesProfileCoverAppState(this.error);
+}
+
+
+
+// Delete Image Profile Cover
+class LoadingDeleteImageProfileCoverAppState extends AppStates {}
+
+class SuccessDeleteImageProfileCoverAppState extends AppStates {}
+
+class ErrorDeleteImageProfileCoverAppState extends AppStates {
+  dynamic error;
+  ErrorDeleteImageProfileCoverAppState(this.error);
+}
+
 // Clear Images
 class SuccessClearImageAppStates extends AppStates {}
 
+// Change Password
+class LoadingChangePasswordAppState extends AppStates {}
+
+class SuccessChangePasswordAppState extends AppStates {}
+
+class ErrorChangePasswordAppState extends AppStates {
+  dynamic error;
+  ErrorChangePasswordAppState(this.error);
+}
 
 // Add Post
 class LoadingAddPostAppState extends AppStates {}

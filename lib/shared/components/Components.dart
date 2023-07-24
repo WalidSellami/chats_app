@@ -3,6 +3,7 @@ import 'dart:ui' as ui;
 import 'package:chat/shared/adaptive/circularIndicator/CircularIndicator.dart';
 import 'package:chat/shared/adaptive/circularIndicator/CircularRingIndicator.dart';
 import 'package:chat/shared/components/Constants.dart';
+import 'package:chat/shared/cubit/appCubit/AppCubit.dart';
 import 'package:chat/shared/cubit/themeCubit/ThemeCubit.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -60,7 +61,7 @@ Widget defaultFormField({
   required TextEditingController controller,
   required TextInputType type,
   required String label,
-  required String? Function(String?) ? validate,
+  required String? Function(String?)? validate,
   FocusNode? focusNode,
   IconData? prefixIcon,
   IconData? suffixIcon,
@@ -328,81 +329,132 @@ Future<void> saveImage(GlobalKey globalKey , context) async {
 
 
 
-dynamic showFullImageAndSave(BuildContext context , globalKey , String tag , image) {
+dynamic showFullImageAndSave(BuildContext context , globalKey , String tag , image , {bool isMyPhotos = false}) {
 
   return navigateTo(context: context, screen: Scaffold(
-    appBar: defaultAppBar(
-      onPress: () {
-        Navigator.pop(context);
-      },
-      actions: [
-        IconButton(
-          onPressed: () async {
-            await saveImage(globalKey , context).then((value) {
-              Navigator.pop(context);
-              showFlutterToast(message: 'The image has been saved to your gallery', state: ToastStates.success, context: context);
-            }).catchError((error) {
-              showFlutterToast(message: '$error', state: ToastStates.error, context: context);
-            });
+        appBar: defaultAppBar(
+          onPress: () {
+            Navigator.pop(context);
           },
-          icon: Icon(
-            EvaIcons.downloadOutline,
-            color: Theme.of(context).colorScheme.primary,
-          ),
-          tooltip: 'Save',
-        ),
-        const SizedBox(
-          width: 6.0,
-        ),
-      ],
-    ),
-    body: Center(
-      child: GestureDetector(
-        onTap: () {
-          Navigator.pop(context);
-        },
-        child: RepaintBoundary(
-          key: globalKey,
-          child: Hero(
-            tag: tag,
-            child: Container(
-              decoration: const BoxDecoration(),
-              child: Image.network('$image',
-                width: double.infinity,
-                height: 450.0,
-                fit: BoxFit.fitWidth,
-                frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                  return child;
-                },
-                loadingBuilder: (context, child, loadingProgress) {
-                  if(loadingProgress == null) {
-                    return child;
-                  } else {
-                    return Container(
-                      width: double.infinity,
-                      height: 450.0,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          width: 0.0,
-                          color: Colors.grey.shade900,
+          actions: [
+            (isMyPhotos == false) ?
+            IconButton(
+              onPressed: () async {
+                await saveImage(globalKey , context).then((value) {
+                  Navigator.pop(context);
+                  showFlutterToast(message: 'The image has been saved to your gallery', state: ToastStates.success, context: context);
+                }).catchError((error) {
+                  showFlutterToast(message: '$error', state: ToastStates.error, context: context);
+                });
+              },
+              icon: Icon(
+                EvaIcons.downloadOutline,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              tooltip: 'Save',
+            ) :
+            PopupMenuButton(
+              itemBuilder: (BuildContext context) {
+                return [
+                  PopupMenuItem(
+                    value: 'save',
+                    child: Row(
+                      children: [
+                        Icon(
+                          EvaIcons.downloadOutline,
+                          color: Theme.of(context).colorScheme.primary,
                         ),
-                      ),
-                      child: Center(child: CircularRingIndicator(os: getOs())),
-                    );
-                  }
-                },
-                errorBuilder: (context, error, stackTrace) {
-                  return const SizedBox(
+                        const SizedBox(
+                          width: 4.0,
+                        ),
+                        const Text('Save'),
+                      ],
+                    ),
+                  ),
+                  const PopupMenuItem(
+                    value: 'remove',
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.close_rounded,
+                          color: Colors.red,
+                        ),
+                        SizedBox(
+                          width: 4.0,
+                        ),
+                        Text('Remove'),
+                      ],
+                    ),
+                  ),
+                  // Add more PopupMenuItems as needed
+                ];
+              },
+              onSelected: (value) async {
+                if(value == 'save') {
+                  await saveImage(globalKey , context).then((value) {
+                    Navigator.pop(context);
+                    showFlutterToast(message: 'The image has been saved to your gallery', state: ToastStates.success, context: context);
+                  }).catchError((error) {
+                    showFlutterToast(message: '$error', state: ToastStates.error, context: context);
+                  });
+                } else if (value == 'remove') {
+                  AppCubit.get(context).deleteImageProfileCover(image);
+                  Navigator.pop(context);
+                }
+              },
+            ),
+            const SizedBox(
+              width: 6.0,
+            ),
+          ],
+        ),
+        body: Center(
+          child: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: RepaintBoundary(
+              key: globalKey,
+              child: Hero(
+                tag: tag,
+                child: Container(
+                  decoration: const BoxDecoration(),
+                  child: Image.network('$image',
                     width: double.infinity,
                     height: 450.0,
-                    child: Center(child:Text('Failed to load' , style: TextStyle(fontSize: 14.0,),)),
-                  );
-                },
-              ),),
+                    fit: BoxFit.fitWidth,
+                    frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                      return child;
+                    },
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if(loadingProgress == null) {
+                        return child;
+                      } else {
+                        return Container(
+                          width: double.infinity,
+                          height: 450.0,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              width: 0.0,
+                              color: Colors.grey.shade900,
+                            ),
+                          ),
+                          child: Center(child: CircularRingIndicator(os: getOs())),
+                        );
+                      }
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return const SizedBox(
+                        width: double.infinity,
+                        height: 450.0,
+                        child: Center(child:Text('Failed to load' , style: TextStyle(fontSize: 14.0,),)),
+                      );
+                    },
+                  ),),
+              ),
+            ),
           ),
         ),
-      ),
-    ),
-  ),
-  );
+        ),
+      );
 }

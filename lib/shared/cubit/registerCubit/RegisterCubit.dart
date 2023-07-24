@@ -3,6 +3,7 @@ import 'package:bloc/bloc.dart';
 import 'package:chat/models/userModel/UserModel.dart';
 import 'package:chat/shared/components/Constants.dart';
 import 'package:chat/shared/cubit/registerCubit/RegisterStates.dart';
+import 'package:chat/shared/network/local/CacheHelper.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
@@ -55,13 +56,15 @@ class RegisterCubit extends Cubit<RegisterStates> {
       email: email,
       uId: uId,
       bio: 'write your bio ...',
-      imageProfile: 'https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.webp',
-      imageCover: 'https://img.freepik.com/free-photo/abstract-textured-backgound_1258-30555.jpg',
+      imageProfile: profile,
+      imageCover: cover,
       senders: {},
       deviceToken: deviceToken,
     );
 
     FirebaseFirestore.instance.collection('users').doc(uId).set(model.toMap()).then((value) {
+
+      CacheHelper.saveData(key: 'isGoogleSignIn', value: false);
 
       emit(SuccessUserCreateRegisterState(model));
 

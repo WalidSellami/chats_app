@@ -14,7 +14,6 @@ class LoginCubit extends Cubit<LoginStates> {
 
   LoginCubit() : super(InitialLoginState());
 
-
   static LoginCubit get(context) => BlocProvider.of(context);
 
 
@@ -24,6 +23,19 @@ class LoginCubit extends Cubit<LoginStates> {
 }) {
 
     emit(LoadingLoginState());
+
+    // AuthCredential credentials = EmailAuthProvider.credential(
+    //   email: FirebaseAuth.instance.currentUser?.email ?? '',
+    //   password: oldPassword,
+    // );
+
+    // Re-authenticate the user to verify the old password
+    // FirebaseAuth.instance.currentUser?.reauthenticateWithCredential(credentials);
+    //
+    // Change the password with the new one
+    // await FirebaseAuth.instance.currentUser.updatePassword(newPassword);
+    //
+    // print('Password changed successfully.');
 
     FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
@@ -89,6 +101,7 @@ class LoginCubit extends Cubit<LoginStates> {
   // You don't have a google account in firestore (the first login with google)
   Future<void> signInWithGoogle() async {
     emit(LoadingGoogleLoginState());
+
     // Trigger the authentication flow
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
 
@@ -113,14 +126,7 @@ class LoginCubit extends Cubit<LoginStates> {
           imageProfile: value.user?.photoURL,
       );
 
-      var deviceToken = await getDeviceToken();
-
-      FirebaseFirestore.instance.collection('users').doc(value.user?.uid).update({
-        'device_token': deviceToken,
-      });
-
       CacheHelper.saveData(key: 'isGoogleSignIn', value: true);
-
 
       // emit(SuccessGoogleLoginState(value.user?.uid));
 
@@ -147,9 +153,8 @@ class LoginCubit extends Cubit<LoginStates> {
       email: email,
       uId: uId,
       bio: 'write your bio ...',
-      imageProfile: imageProfile ??
-          'https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.webp',
-      imageCover: 'https://img.freepik.com/free-photo/abstract-textured-backgound_1258-30555.jpg',
+      imageProfile: imageProfile ?? profile,
+      imageCover: cover,
       senders: {},
       deviceToken: deviceToken,
     );
