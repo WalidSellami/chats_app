@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:chat/models/messageModel/MessageModel.dart';
 import 'package:chat/models/userModel/UserModel.dart';
 import 'package:chat/shared/adaptive/circularIndicator/CircularIndicator.dart';
@@ -40,15 +39,17 @@ class _UserChatScreenState extends State<UserChatScreen> {
 
   late ScrollController scrollController;
 
-  GlobalKey globalKey = GlobalKey();
+  final GlobalKey globalKey = GlobalKey();
+
+  final ScrollController controller = ScrollController();
 
 
   void scrollBottom() {
     if(scrollController.hasClients) {
       scrollController.animateTo(
-        scrollController.position.maxScrollExtent + 100,
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOut,
+        scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.easeIn,
       );
     }
   }
@@ -56,9 +57,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
   @override
   void initState() {
     super.initState();
-    scrollController = ScrollController();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      // FocusScope.of(context).requestFocus(focusNode);
       scrollBottom();
     });
   }
@@ -90,13 +89,19 @@ class _UserChatScreenState extends State<UserChatScreen> {
                   Navigator.pop(context);
                   AppCubit.get(context).clearImageMessage();
                 }
-                WidgetsBinding.instance.addPostFrameCallback((_) {
-                  scrollBottom();
-                });
                 setState(() {
                   isVisible = false;
                 });
               }
+
+
+              if(state is SuccessGetMessagesAppState) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  scrollBottom();
+                });
+                AppCubit.get(context).clearNotice(receiverId: widget.user.uId.toString());
+              }
+
 
               if (state is SuccessGetImageMessageAppState) {
                 setState(() {
@@ -116,7 +121,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
               return Scaffold(
                 appBar: defaultAppBar(
                   onPress: () {
-                    // cubit.clearMessages();
+                    cubit.clearMessages();
                     Navigator.pop(context);
                   },
                   text: '${widget.user.userName}',
@@ -383,7 +388,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                   borderRadius: BorderRadius.circular(
                                     8.0,
                                   ),
-                                  onTap: () {
+                                  onTap: () async {
                                     if (checkCubit.hasInternet) {
                                       if (formKey.currentState!.validate()) {
                                         if (cubit.imageMessage == null) {
@@ -412,16 +417,19 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                                   messageController.text,
                                               dateTime: Timestamp.now());
 
-                                          cubit.sendNotification(
-                                              title:
-                                                  (cubit.userProfile?.userName)
-                                                      .toString(),
-                                              body: (messageController
-                                                      .text.isEmpty)
-                                                  ? 'Sent a photo'
-                                                  : messageController.text,
-                                              token: widget.user.deviceToken
-                                                  .toString());
+                                          await Future.delayed(const Duration(milliseconds: 800)).then((value) async {
+                                            await cubit.sendNotification(
+                                                title:
+                                                (cubit.userProfile?.userName)
+                                                    .toString(),
+                                                body: (messageController
+                                                    .text.isEmpty)
+                                                    ? 'Sent a photo'
+                                                    : messageController.text,
+                                                token: widget.user.deviceToken
+                                                    .toString());
+                                          });
+
                                         }
 
                                         setState(() {

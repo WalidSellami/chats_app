@@ -80,6 +80,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                 return Scaffold(
                   body: (checkCubit.hasInternet) ? SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Column(
@@ -342,6 +343,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
+                          ),
+                          const SizedBox(
+                            height: 10.0,
                           ),
                         ],
                       ),

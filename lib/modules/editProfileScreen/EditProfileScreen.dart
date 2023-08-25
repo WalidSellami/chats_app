@@ -128,7 +128,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ]),
                   body: SingleChildScrollView(
                     child: Padding(
-                      padding: const EdgeInsets.all(10.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Form(
                         key: formKey,
                         child: Column(children: [

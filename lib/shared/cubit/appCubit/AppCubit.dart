@@ -1,6 +1,4 @@
 import 'dart:io';
-
-import 'package:bloc/bloc.dart';
 import 'package:chat/models/commentModel/CommentModel.dart';
 import 'package:chat/models/messageModel/MessageModel.dart';
 import 'package:chat/models/postModel/PostModel.dart';
@@ -31,37 +29,6 @@ class AppCubit extends Cubit<AppStates> {
 
   int currentIndex = 0;
 
-  // List<SalomonBottomBarItem> items = [
-  //   SalomonBottomBarItem(
-  //     icon: const Icon(EvaIcons.homeOutline, size: 26.0,),
-  //     title: const Text(''),
-  //     activeIcon: const Icon(EvaIcons.home , size: 28.0,),
-  //   ),
-  //
-  //   SalomonBottomBarItem(
-  //     icon: const Icon(EvaIcons.messageCircleOutline, size: 26.0,),
-  //     title: const Text(''),
-  //     activeIcon:  const Icon(EvaIcons.messageCircle , size: 28.0,),
-  //   ),
-  //
-  //   SalomonBottomBarItem(
-  //     icon: const Icon(Icons.add_circle_rounded, size: 35.0,),
-  //     title: const Text(''),
-  //   ),
-  //
-  //   SalomonBottomBarItem(
-  //     icon: const Icon(EvaIcons.peopleOutline, size: 26.0,),
-  //     title: const Text(''),
-  //     activeIcon: const Icon(EvaIcons.people, size: 28.0,)
-  //   ),
-  //
-  //   SalomonBottomBarItem(
-  //     icon: const Icon(EvaIcons.settingsOutline, size: 26.0,),
-  //     title: const Text(''),
-  //     activeIcon: const Icon(EvaIcons.settings, size: 28.0,),
-  //   ),
-  //
-  // ];
 
   List<Widget> screens = [
     const HomeScreen(),
@@ -72,7 +39,7 @@ class AppCubit extends Cubit<AppStates> {
   ];
 
   List<String> titles = [
-    'Home' , 'Chat' , '' , 'Users' , 'Settings'
+    'Home' , 'Chats' , '' , 'Users' , 'Settings'
   ];
 
 
@@ -96,7 +63,9 @@ class AppCubit extends Cubit<AppStates> {
 
     FirebaseFirestore.instance.collection('users').doc(uId).snapshots().listen((value) {
 
-      userProfile = UserModel.fromJson(value.data()!);
+      if(value.data() != null) {
+        userProfile = UserModel.fromJson(value.data()!);
+      }
 
       numberNotice = 0;
 
@@ -465,11 +434,11 @@ class AppCubit extends Cubit<AppStates> {
       userName: userProfile?.userName,
       uId: uId ?? userProfile?.uId,
       imageProfile: userProfile?.imageProfile,
-      like: false,
       tagPost: tag ?? '',
       datePost: date,
       timestamp: timestamp,
       imagePost: imagePost ?? '',
+      likes: {},
     );
 
     FirebaseFirestore.instance.collection('posts').add(model.toMap()).then((value) {
@@ -530,6 +499,7 @@ class AppCubit extends Cubit<AppStates> {
 
         }
 
+          emit(SuccessGetPostsAppState());
 
         });
 
@@ -545,6 +515,8 @@ class AppCubit extends Cubit<AppStates> {
             numberComments.addAll({elementPost.id : 0,});
 
           }
+
+          emit(SuccessGetPostsAppState());
 
         });
 
@@ -778,9 +750,11 @@ class AppCubit extends Cubit<AppStates> {
     required String phone,
     required String bio,
     required String postId,
-}) {
+}) async {
 
     emit(LoadingLikePostAppState());
+
+    var deviceToken = await getDeviceToken();
 
     UserModel model = UserModel(
       userName: userName,
@@ -789,13 +763,20 @@ class AppCubit extends Cubit<AppStates> {
       email: email,
       phone: phone,
       bio: bio,
+      uId: userProfile?.uId ?? uId,
+      deviceToken: userProfile?.deviceToken ?? deviceToken,
+      senders: {},
     );
 
     FirebaseFirestore.instance.collection('posts').doc(postId).collection('likes').doc(uId).set(model.toMap()).then((value) {
 
-      FirebaseFirestore.instance.collection('posts').doc(postId).update({'like': true});
+      FirebaseFirestore.instance.collection('posts').doc(postId).update({
+        'likes' : {
+          uId: true,
+        }
+      });
 
-      emit(SuccessLikePostAppState());
+     getPosts();
     }).catchError((error) {
 
       emit(ErrorLikePostAppState(error));
@@ -846,9 +827,13 @@ class AppCubit extends Cubit<AppStates> {
     emit(LoadingDisLikePostAppState());
     FirebaseFirestore.instance.collection('posts').doc(postId).collection('likes').doc(uId).delete().then((value) {
 
-      FirebaseFirestore.instance.collection('posts').doc(postId).update({'like': false});
+      FirebaseFirestore.instance.collection('posts').doc(postId).update({
+        'likes' : {
+          uId: false,
+        }
+      });
 
-      emit(SuccessDisLikePostAppState());
+      getPosts();
     }).catchError((error) {
 
       emit(ErrorDisLikePostAppState(error));
@@ -1051,18 +1036,24 @@ class AppCubit extends Cubit<AppStates> {
 
       }
 
-      FirebaseFirestore.instance.collection('users').doc(uId).update({
-        'senders' : {
-          receiverId: false,
-        },
-      });
-
-      numberNotice--;
-
       emit(SuccessGetMessagesAppState());
     });
 
 
+  }
+
+
+  void clearNotice({
+    required String receiverId,
+}) {
+    FirebaseFirestore.instance.collection('users').doc(uId).update({
+      'senders' : {
+        receiverId: false,
+      },
+    });
+
+    numberNotice--;
+    emit(SuccessClearAppState());
   }
 
 
@@ -1212,8 +1203,6 @@ class AppCubit extends Cubit<AppStates> {
 }) async {
 
     const url = 'https://fcm.googleapis.com/fcm/send';
-
-    // var token = await FirebaseMessaging.instance.getToken();
 
     final data = {
       "data": {

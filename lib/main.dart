@@ -7,6 +7,7 @@ import 'package:chat/shared/components/Constants.dart';
 import 'package:chat/shared/cubit/appCubit/AppCubit.dart';
 import 'package:chat/shared/cubit/checkCubit/CheckCubit.dart';
 import 'package:chat/shared/cubit/loginCubit/LoginCubit.dart';
+import 'package:chat/shared/cubit/registerCubit/RegisterCubit.dart';
 import 'package:chat/shared/cubit/themeCubit/ThemeCubit.dart';
 import 'package:chat/shared/cubit/themeCubit/ThemeStates.dart';
 import 'package:chat/shared/network/local/CacheHelper.dart';
@@ -112,6 +113,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (BuildContext context) => AppCubit()..getUserProfile()),
         BlocProvider(create: (BuildContext context) => LoginCubit()),
+        BlocProvider(create: (BuildContext context) => RegisterCubit()),
         BlocProvider(create: (BuildContext context) => CheckCubit()..checkConnection(context)),
         BlocProvider(create: (BuildContext context) => ThemeCubit()..changeMode(isDark ?? false),
         ),

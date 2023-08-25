@@ -70,7 +70,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
                         body: (checkCubit.hasInternet) ? ConditionalBuilder(
                           condition: photos.isNotEmpty,
                           builder: (context) => Padding(
-                            padding: const EdgeInsets.all(8.0),
+                            padding: const EdgeInsets.all(10.0),
                             child: MasonryGridView.count(
                               physics: const BouncingScrollPhysics(),
                               crossAxisCount: 3,

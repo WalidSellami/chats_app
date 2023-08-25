@@ -74,9 +74,6 @@ class RegisterCubit extends Cubit<RegisterStates> {
       }
       emit(ErrorUserCreateRegisterState(error));
     });
-
-
   }
-
 
 }

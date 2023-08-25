@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:chat/shared/adaptive/circularIndicator/CircularRingIndicator.dart';
 import 'package:chat/shared/components/Components.dart';
 import 'package:chat/shared/components/Constants.dart';

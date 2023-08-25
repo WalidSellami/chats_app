@@ -93,7 +93,7 @@ class _ChangePasswordsScreenState extends State<ChangePasswordsScreen> {
               body: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Form(
                     key: formKey,
                     autovalidateMode: AutovalidateMode.always,

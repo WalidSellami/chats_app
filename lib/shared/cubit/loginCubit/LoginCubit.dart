@@ -24,19 +24,6 @@ class LoginCubit extends Cubit<LoginStates> {
 
     emit(LoadingLoginState());
 
-    // AuthCredential credentials = EmailAuthProvider.credential(
-    //   email: FirebaseAuth.instance.currentUser?.email ?? '',
-    //   password: oldPassword,
-    // );
-
-    // Re-authenticate the user to verify the old password
-    // FirebaseAuth.instance.currentUser?.reauthenticateWithCredential(credentials);
-    //
-    // Change the password with the new one
-    // await FirebaseAuth.instance.currentUser.updatePassword(newPassword);
-    //
-    // print('Password changed successfully.');
-
     FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password).then((value) async {

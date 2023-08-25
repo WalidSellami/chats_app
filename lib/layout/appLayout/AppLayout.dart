@@ -15,8 +15,22 @@ import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:hexcolor/hexcolor.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
-class AppLayout extends StatelessWidget {
+class AppLayout extends StatefulWidget {
   const AppLayout({super.key});
+
+  @override
+  State<AppLayout> createState() => _AppLayoutState();
+}
+
+class _AppLayoutState extends State<AppLayout> {
+
+
+
+  @override
+  void initState() {
+    super.initState();
+    AppCubit.get(context).getUserProfile();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +157,7 @@ class AppLayout extends StatelessWidget {
                             ),
                             SalomonBottomBarItem(
                               icon: SizedBox(
-                                height: 35.0,
+                                height: 30.0,
                                 child: Stack(
                                   alignment: Alignment.topRight,
                                   children: [

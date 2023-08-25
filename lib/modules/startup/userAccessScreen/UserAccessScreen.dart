@@ -94,7 +94,7 @@ class _UserAccessScreenState extends State<UserAccessScreen> {
                   child: Column(
                     children: [
                       CircleAvatar(
-                        radius: 34.0,
+                        radius: 36.0,
                         backgroundColor: Theme.of(context).colorScheme.primary,
                         backgroundImage: NetworkImage(widget.imageProfile),
                       ),

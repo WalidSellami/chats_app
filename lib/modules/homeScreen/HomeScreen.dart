@@ -31,11 +31,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   GlobalKey globalKey = GlobalKey();
 
-  @override
-  void initState() {
-    super.initState();
-    AppCubit.get(context).getUserProfile();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -386,7 +381,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(4.0),
                   onTap: () {
 
-                    if(post.like == false) {
+                    if(post.likes?[uId] == false) {
 
                       AppCubit.get(context).likePost(
                           userName: (user?.userName).toString(),
@@ -406,30 +401,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                   child: Padding(
                     padding: const EdgeInsets.all(5.0),
-                    child: Row(
-                      children: [
-                        ((post.like == true)) ? Icon(
-                            Icons.favorite_rounded,
-                          size: 19.0,
-                          color: HexColor('f9325f'),
-                        ) : Icon(
-                          Icons.favorite_outline_rounded,
-                          size: 19.0,
-                          color: HexColor('f9325f'),
-                        ),
-                        (post.like == true) ? const Text(
-                          ' Liked',
-                          style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 13.0,
-                          ),
-                        ) : const Text(
-                           ' Like',
-                          style: TextStyle(
-                            fontSize: 13.0,
-                          ),
-                        ),
-                      ],
+                    child: ((post.likes?[uId] == true)) ? Icon(
+                        Icons.favorite_rounded,
+                      size: 19.0,
+                      color: HexColor('f9325f'),
+                    ) : Icon(
+                      Icons.favorite_outline_rounded,
+                      size: 19.0,
+                      color: HexColor('f9325f'),
                     ),
                   ),
                 ),

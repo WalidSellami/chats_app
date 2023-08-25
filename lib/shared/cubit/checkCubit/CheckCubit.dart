@@ -47,6 +47,7 @@ class CheckCubit extends Cubit<CheckStates> {
       ) : null;
 
       if(hasInternet) {
+        AppCubit.get(context).getUserProfile();
         AppCubit.get(context).getPosts();
         AppCubit.get(context).getAllUsers();
       }

@@ -4,11 +4,11 @@ class PostModel {
   String? userName;
   String? uId;
   String? imageProfile;
-  bool? like;
   String? tagPost;
   String? datePost;
   dynamic timestamp;
   String? imagePost;
+  Map<String , dynamic>? likes;
 
 
   PostModel({
@@ -16,11 +16,11 @@ class PostModel {
     this.userName,
     this.uId,
     this.imageProfile,
-    this.like,
     this.tagPost,
     this.datePost,
     this.timestamp,
     this.imagePost,
+    this.likes,
 });
 
   PostModel.fromJson(Map<String , dynamic> json) {
@@ -29,11 +29,11 @@ class PostModel {
     userName = json['user_name'];
     uId = json['uId'];
     imageProfile = json['image_profile'];
-    like = json['like'];
     tagPost = json['tag_post'];
     datePost = json['date_time'];
     timestamp = json['timestamp'];
     imagePost = json['image_post'];
+    likes = json['likes'];
 
 
   }
@@ -46,11 +46,11 @@ class PostModel {
       'user_name': userName,
       'uId': uId,
       'image_profile': imageProfile,
-      'like': like,
       'tag_post': tagPost,
       'date_time': datePost,
       'timestamp': timestamp,
       'image_post': imagePost,
+      'likes': likes,
 
     };
 
