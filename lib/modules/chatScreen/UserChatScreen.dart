@@ -37,11 +37,9 @@ class _UserChatScreenState extends State<UserChatScreen> {
 
   bool isVisible = false;
 
-  late ScrollController scrollController;
+  final  ScrollController scrollController = ScrollController();
 
   final GlobalKey globalKey = GlobalKey();
-
-  final ScrollController controller = ScrollController();
 
 
   void scrollBottom() {
@@ -442,7 +440,6 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                           state: ToastStates.error,
                                           context: context);
                                     }
-                                    focusNode.unfocus();
                                   },
                                   child: Padding(
                                     padding: const EdgeInsets.all(4.0),
@@ -548,7 +545,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                   clipBehavior: Clip.antiAliasWithSaveLayer,
                   child: Image.network(
                     '${model.messageImage}',
-                    width: 120.0,
+                    width: 150.0,
                     height: 150.0,
                     fit: BoxFit.cover,
                     frameBuilder:
@@ -560,7 +557,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                         return child;
                       } else {
                         return Container(
-                          width: 120,
+                          width: 150,
                           height: 150.0,
                           decoration: BoxDecoration(
                             border: Border.all(
@@ -711,7 +708,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                   clipBehavior: Clip.antiAliasWithSaveLayer,
                   child: Image.network(
                     '${model.messageImage}',
-                    width: 120.0,
+                    width: 150.0,
                     height: 150.0,
                     fit: BoxFit.cover,
                     frameBuilder:
@@ -723,7 +720,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                         return child;
                       } else {
                         return Container(
-                          width: 120,
+                          width: 150,
                           height: 150.0,
                           decoration: BoxDecoration(
                             border: Border.all(
@@ -740,7 +737,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                     },
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        width: 120.0,
+                        width: 150.0,
                         height: 150.0,
                         decoration: BoxDecoration(
                           border: Border.all(

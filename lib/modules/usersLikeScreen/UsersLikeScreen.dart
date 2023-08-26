@@ -76,7 +76,7 @@ class _UsersLikeScreenState extends State<UsersLikeScreen> {
                           color: Colors.grey.shade500,
                         ),
                       ),
-                      itemCount: 1),
+                      itemCount: cubit.usersLikes.length),
                 ),
                 fallback: (context) => (state is LoadingGetUsersLikesAppState)  ? Center(child: CircularIndicator(os: getOs()))
                     : const Center(

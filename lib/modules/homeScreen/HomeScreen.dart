@@ -295,7 +295,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Row(
                     children: [
                       Icon(
-                        (numberLikes[postId] != 0) ? Icons.favorite_outlined : Icons.favorite_outline_rounded,
+                        Icons.favorite_rounded,
                         size: 19.0,
                         color: HexColor('f9325f'),
                       ),
@@ -356,6 +356,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundColor: Theme.of(context).colorScheme.primary,
                     backgroundImage: NetworkImage('${post.imageProfile}'),
                   ),
+                  const SizedBox(
+                    width: 4.0,
+                  ),
                   InkWell(
                     borderRadius: BorderRadius.circular(4.0),
                     onTap: () {
@@ -377,38 +380,41 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.only(
                   right: 8.0,
                 ),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(4.0),
-                  onTap: () {
+                child: Material(
+                  color: ThemeCubit.get(context).isDark ? Colors.grey.shade800.withOpacity(.6) : Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(10.0),
+                  elevation: 2.0,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(10.0),
+                    onTap: () {
 
-                    if(post.likes?[uId] == false) {
+                      if((post.likes?[uId] == false) || (post.likes?[uId] == null)) {
 
-                      AppCubit.get(context).likePost(
-                          userName: (user?.userName).toString(),
-                          imageProfile: (user?.imageProfile).toString(),
-                          imageCover: (user?.imageCover).toString(),
-                          email: (user?.email).toString(),
-                          phone: (user?.phone).toString(),
-                          bio: (user?.bio).toString(),
-                          postId: postId);
+                        AppCubit.get(context).likePost(
+                            userName: (user?.userName).toString(),
+                            imageProfile: (user?.imageProfile).toString(),
+                            imageCover: (user?.imageCover).toString(),
+                            email: (user?.email).toString(),
+                            phone: (user?.phone).toString(),
+                            bio: (user?.bio).toString(),
+                            postId: postId);
 
-                    } else {
+                      } else {
 
-                      AppCubit.get(context).dislikePost(postId: postId);
+                        AppCubit.get(context).dislikePost(postId: postId);
 
-                    }
+                      }
 
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: ((post.likes?[uId] == true)) ? Icon(
-                        Icons.favorite_rounded,
-                      size: 19.0,
-                      color: HexColor('f9325f'),
-                    ) : Icon(
-                      Icons.favorite_outline_rounded,
-                      size: 19.0,
-                      color: HexColor('f9325f'),
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Icon(
+                        ((post.likes?[uId] == true)) ?
+                        Icons.favorite_rounded :
+                        Icons.favorite_outline_rounded,
+                        size: 22.0,
+                        color: HexColor('f9325f'),
+                      ),
                     ),
                   ),
                 ),

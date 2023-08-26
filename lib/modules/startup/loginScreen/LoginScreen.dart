@@ -111,6 +111,20 @@ class _LoginScreenState extends State<LoginScreen> {
 
                     });
                   }
+
+                  if(state is SuccessGoogleLoginState) {
+                    showFlutterToast(message: 'Login done successfully', state: ToastStates.success, context: context);
+
+                    CacheHelper.saveData(key: 'uId', value: state.uId).then((value) {
+
+                      uId = state.uId;
+
+                      Navigator.pop(context);
+                      navigateAndNotReturn(context: context, screen: const AppLayout());
+
+                    });
+                  }
+
                 },
                 builder: (context , state) {
 

@@ -105,7 +105,7 @@ class _AppLayoutState extends State<AppLayout> {
                         systemNavigationBarIconBrightness: Brightness.light,
                       ),
                       actions: [
-                        if (cubit.currentIndex == 1 || cubit.currentIndex == 3)
+                        if ((cubit.currentIndex == 1 || cubit.currentIndex == 3) && cubit.allUsers.isNotEmpty)
                           IconButton(
                             onPressed: () {
                               if (checkCubit.hasInternet) {
@@ -157,7 +157,7 @@ class _AppLayoutState extends State<AppLayout> {
                             ),
                             SalomonBottomBarItem(
                               icon: SizedBox(
-                                height: 30.0,
+                                height: 32.0,
                                 child: Stack(
                                   alignment: Alignment.topRight,
                                   children: [

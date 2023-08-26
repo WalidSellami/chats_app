@@ -1,4 +1,6 @@
 
+import 'dart:js_interop';
+
 import 'package:bloc/bloc.dart';
 import 'package:chat/models/userModel/UserModel.dart';
 import 'package:chat/shared/components/Constants.dart';
@@ -104,18 +106,36 @@ class LoginCubit extends Cubit<LoginStates> {
     // Once signed in, return the UserCredential
     FirebaseAuth.instance.signInWithCredential(credential).then((value) async {
 
+      await FirebaseFirestore.instance.collection('users').doc(value.user!.uid).get().then((v) async {
 
-      userLoginCreate(
-          userName: value.user?.displayName,
-          phone: value.user?.phoneNumber,
-          email: value.user?.email,
-          uId: value.user?.uid,
-          imageProfile: value.user?.photoURL,
-      );
+        CacheHelper.saveData(key: 'isGoogleSignIn', value: true);
 
-      CacheHelper.saveData(key: 'isGoogleSignIn', value: true);
+        if(v.data() == null) {
 
-      // emit(SuccessGoogleLoginState(value.user?.uid));
+          userLoginCreate(
+            userName: value.user?.displayName,
+            phone: value.user?.phoneNumber,
+            email: value.user?.email,
+            uId: value.user?.uid,
+            imageProfile: value.user?.photoURL,
+          );
+
+        } else {
+
+          var deviceToken = await getDeviceToken();
+
+          FirebaseFirestore.instance.collection('users').doc(value.user?.uid).update({
+            'device_token': deviceToken,
+          });
+
+
+          emit(SuccessGoogleLoginState(value.user?.uid));
+
+        }
+
+
+      });
+
 
     }).catchError((error) {
 

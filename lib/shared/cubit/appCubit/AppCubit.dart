@@ -771,9 +771,7 @@ class AppCubit extends Cubit<AppStates> {
     FirebaseFirestore.instance.collection('posts').doc(postId).collection('likes').doc(uId).set(model.toMap()).then((value) {
 
       FirebaseFirestore.instance.collection('posts').doc(postId).update({
-        'likes' : {
-          uId: true,
-        }
+        'likes.$uId': true,
       });
 
      getPosts();
@@ -800,6 +798,10 @@ class AppCubit extends Cubit<AppStates> {
       for(var element in event.docs) {
 
         usersLikes.add(UserModel.fromJson(element.data()));
+
+        if (kDebugMode) {
+          print(usersLikes);
+        }
 
         if((element.id == uId) &&
             ((element.data()['image_profile'] != userProfile?.imageProfile) ||
@@ -828,9 +830,7 @@ class AppCubit extends Cubit<AppStates> {
     FirebaseFirestore.instance.collection('posts').doc(postId).collection('likes').doc(uId).delete().then((value) {
 
       FirebaseFirestore.instance.collection('posts').doc(postId).update({
-        'likes' : {
-          uId: false,
-        }
+        'likes.$uId': false,
       });
 
       getPosts();
