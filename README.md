@@ -1,6 +1,6 @@
 # chat
 
-A new Flutter project.
+A new Flutter app project  --> A social app (post, like, comment, and chat) and some features.
 
 ## Getting Started
 
