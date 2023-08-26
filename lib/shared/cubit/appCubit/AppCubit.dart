@@ -981,9 +981,7 @@ class AppCubit extends Cubit<AppStates> {
         .doc(receiverId).collection('messages').add(model.toMap()).then((value) {
 
       FirebaseFirestore.instance.collection('users').doc(uId).update({
-         'senders' : {
-           receiverId: false,
-         },
+         'senders.$receiverId': false,
       });
 
           emit(SuccessSendMessageAppState());
@@ -997,9 +995,7 @@ class AppCubit extends Cubit<AppStates> {
         .doc(uId).collection('messages').add(model.toMap()).then((value) {
 
       FirebaseFirestore.instance.collection('users').doc(receiverId).update({
-        'senders' : {
-          uId: true,
-        },
+        'senders.$uId': true,
       });
 
       emit(SuccessSendMessageAppState());
@@ -1047,9 +1043,7 @@ class AppCubit extends Cubit<AppStates> {
     required String receiverId,
 }) {
     FirebaseFirestore.instance.collection('users').doc(uId).update({
-      'senders' : {
-        receiverId: false,
-      },
+     'senders.$receiverId': false,
     });
 
     numberNotice--;
