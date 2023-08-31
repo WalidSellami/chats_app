@@ -171,6 +171,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
+              if(post.uId == uId)
               IconButton(
                   onPressed: () {
                     AppCubit.get(context).deletePost(postId: postId , postImage: post.imagePost);

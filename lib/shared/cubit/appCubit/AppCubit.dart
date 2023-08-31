@@ -799,10 +799,6 @@ class AppCubit extends Cubit<AppStates> {
 
         usersLikes.add(UserModel.fromJson(element.data()));
 
-        if (kDebugMode) {
-          print(usersLikes);
-        }
-
         if((element.id == uId) &&
             ((element.data()['image_profile'] != userProfile?.imageProfile) ||
                 (element.data()['user_name'] != userProfile?.userName))) {
