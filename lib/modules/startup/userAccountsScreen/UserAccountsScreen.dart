@@ -232,7 +232,7 @@ class _UserAccountsScreenState extends State<UserAccountsScreen> {
           Navigator.of(context).push(createRoute(screen: UserAccessScreen(email: account['email'], imageProfile: account['image_profile'],)));
         } else {
           showLoading(context);
-          await LoginCubit.get(context).signInWithGoogleAccount();
+          await LoginCubit.get(context).signInWithGoogle();
         }
       } else {
         showFlutterToast(message: 'No Internet Connection', state: ToastStates.error, context: context);

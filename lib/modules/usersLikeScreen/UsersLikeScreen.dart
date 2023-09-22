@@ -130,7 +130,7 @@ class _UsersLikeScreenState extends State<UsersLikeScreen> {
             backgroundImage: NetworkImage('${user.imageProfile}'),
           ),
           const SizedBox(
-            width: 25.0,
+            width: 20.0,
           ),
           Expanded(
             child: Text(

@@ -63,9 +63,10 @@ class AppCubit extends Cubit<AppStates> {
 
     FirebaseFirestore.instance.collection('users').doc(uId).snapshots().listen((value) {
 
-      if(value.data() != null) {
+      if((value.data() != null) && (value.data()?['uId'] == uId)) {
         userProfile = UserModel.fromJson(value.data()!);
       }
+
 
       numberNotice = 0;
 
@@ -468,6 +469,9 @@ class AppCubit extends Cubit<AppStates> {
   Map<String , dynamic> numberLikes = {};
 
 
+  List<String> idFavorites = [];
+
+
   void getPosts() {
 
     emit(LoadingGetPostsAppState());
@@ -550,12 +554,26 @@ class AppCubit extends Cubit<AppStates> {
   }
 
 
+  List<String> commentsId = [];
+  List<CommentModel> comments = [];
+
 
   void deletePost({
     required String postId,
     String? postImage,
 }) {
+
     emit(LoadingDeletePostAppState());
+
+    if(idFavorites.isNotEmpty || (numberLikes[postId] > 0)) {
+      deleteAllLikesForPost(postId: postId);
+    }
+
+
+    if(commentsId.isNotEmpty || (numberComments[postId] > 0)) {
+      deleteAllCommentsForPost(postId: postId);
+    }
+
     FirebaseFirestore.instance.collection('posts').doc(postId).delete().then((value) {
 
       if(postImage != '') {
@@ -578,6 +596,69 @@ class AppCubit extends Cubit<AppStates> {
     });
 
     }
+
+
+
+  void deleteAllLikesForPost({
+    required String postId,
+  }) {
+
+    emit(LoadingDeleteAllLikesForPostAppState());
+
+    for (var element in idFavorites) {
+
+      FirebaseFirestore.instance.collection('posts').doc(postId).collection('likes').doc(element).delete().then((value) {
+
+        emit(SuccessDeleteAllLikesForPostAppState());
+
+      }).catchError((error) {
+
+        emit(ErrorDeleteAllLikesForPostAppState(error));
+
+      });
+    }
+
+  }
+
+
+
+  void deleteAllCommentsForPost({
+    required String postId,
+  }) {
+
+    emit(LoadingDeleteAllCommentsForPostAppState());
+
+    for (var element in commentsId) {
+
+      FirebaseFirestore.instance.collection('posts').doc(postId).collection('comments').doc(element).delete().then((value) {
+
+        for (var elt in comments) {
+
+          if(elt.imageComment != '') {
+
+            String fileName = getFileNameFromUrl(elt.imageComment!);
+
+            firebase_storage.FirebaseStorage.instance.ref().child('posts/comments/$fileName').delete().then((value) {
+
+              emit(SuccessClearAppState());
+            }).catchError((error) {
+
+              emit(ErrorDeleteCommentImageAppState(error));
+            });
+          }
+
+        }
+
+        emit(SuccessDeleteAllCommentsForPostAppState());
+
+      }).catchError((error) {
+
+        emit(ErrorDeleteAllCommentsForPostAppState(error));
+
+      });
+    }
+
+  }
 
 
   XFile? imageComment;
@@ -654,7 +735,7 @@ class AppCubit extends Cubit<AppStates> {
 
       value.ref.getDownloadURL().then((value) {
 
-       addComment(postId: postId, text: text, date: date , timestamp: timestamp);
+       addComment(postId: postId, text: text, date: date , timestamp: timestamp, imageComment: value);
 
       }).catchError((error) {
 
@@ -668,10 +749,6 @@ class AppCubit extends Cubit<AppStates> {
 
   }
 
-
-
-  List<String> commentsId = [];
-  List<CommentModel> comments = [];
 
 
   void getPostComments({
@@ -797,6 +874,7 @@ class AppCubit extends Cubit<AppStates> {
 
       for(var element in event.docs) {
 
+        idFavorites.add(element.id);
         usersLikes.add(UserModel.fromJson(element.data()));
 
         if((element.id == uId) &&
@@ -810,6 +888,10 @@ class AppCubit extends Cubit<AppStates> {
 
         }
 
+      }
+
+      if (kDebugMode) {
+        print(idFavorites);
       }
 
       emit(SuccessGetUsersLikesAppState());
@@ -879,7 +961,7 @@ class AppCubit extends Cubit<AppStates> {
 
   void clearSearchUser() {
 
-    searchUsers = [];
+    searchUsers.clear();
     emit(SuccessClearAppState());
 
   }
@@ -981,24 +1063,26 @@ class AppCubit extends Cubit<AppStates> {
       });
 
           emit(SuccessSendMessageAppState());
+
     }).catchError((error) {
 
          emit(ErrorSendMessageAppState(error));
     });
 
 
-    FirebaseFirestore.instance.collection('users').doc(receiverId).collection('chats')
-        .doc(uId).collection('messages').add(model.toMap()).then((value) {
+      FirebaseFirestore.instance.collection('users').doc(receiverId).collection('chats')
+          .doc(uId).collection('messages').add(model.toMap()).then((value) {
 
-      FirebaseFirestore.instance.collection('users').doc(receiverId).update({
-        'senders.$uId': true,
+        FirebaseFirestore.instance.collection('users').doc(receiverId).update({
+          'senders.$uId': true,
+        });
+
+        emit(SuccessSendMessageAppState());
+      }).catchError((error) {
+
+        emit(ErrorSendMessageAppState(error));
       });
 
-      emit(SuccessSendMessageAppState());
-    }).catchError((error) {
-
-      emit(ErrorSendMessageAppState(error));
-    });
 
 
   }
@@ -1007,6 +1091,10 @@ class AppCubit extends Cubit<AppStates> {
 
   List<String> messagesId = [];
   List<MessageModel> messages = [];
+
+  List<String> receiverMessagesId = [];
+
+
 
   void getMessages({
     required String receiverId,
@@ -1032,6 +1120,21 @@ class AppCubit extends Cubit<AppStates> {
     });
 
 
+    FirebaseFirestore.instance.collection('users').doc(receiverId).collection('chats')
+        .doc(uId).collection('messages').orderBy('timestamp').snapshots().listen((event) {
+
+      receiverMessagesId = [];
+
+      for(var element in event.docs) {
+
+        receiverMessagesId.add(element.id);
+
+      }
+
+      emit(SuccessGetReceiverMessagesAppState());
+    });
+
+
   }
 
 
@@ -1048,7 +1151,7 @@ class AppCubit extends Cubit<AppStates> {
 
 
   void clearMessages() {
-    messages = [];
+    messages.clear();
     emit(SuccessClearAppState());
   }
 
@@ -1056,12 +1159,22 @@ class AppCubit extends Cubit<AppStates> {
   void deleteMessage({
     required String receiverId,
     required String messageId,
+    required String receiverMessageId,
     String? messageImage,
+    bool isUnSend = false,
 }) {
 
     emit(LoadingDeleteMessageAppState());
+
     FirebaseFirestore.instance.collection('users').doc(uId).collection('chats')
         .doc(receiverId).collection('messages').doc(messageId).delete().then((value) {
+
+          if(isUnSend) {
+            FirebaseFirestore.instance.collection('users').doc(receiverId).collection('chats')
+                .doc(uId).collection('messages').doc(receiverMessageId).delete().then((value) {
+               emit(SuccessClearAppState());
+            });
+          }
 
         if(messageImage != '') {
 
@@ -1090,6 +1203,7 @@ class AppCubit extends Cubit<AppStates> {
     });
 
   }
+
 
 
 

@@ -58,10 +58,6 @@ class Notifications {
 
     FirebaseMessaging.onMessage.listen((event) async {
 
-      // if (kDebugMode) {
-      //   print(event.data);
-      // }
-
       Data data = Data.fromJson(event.data);
 
       if((data.title != null) && (data.message != null)) {

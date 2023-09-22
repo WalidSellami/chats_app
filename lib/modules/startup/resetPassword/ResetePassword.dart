@@ -79,7 +79,7 @@ class _ResetPasswordState extends State<ResetPassword> {
                         isSend = false;
                       });
                     },
-                    text: 'Email Verification',
+                    text: '',
                   ),
                   body: Padding(
                     padding: const EdgeInsets.all(12.0),

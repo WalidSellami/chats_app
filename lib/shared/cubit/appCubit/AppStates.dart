@@ -151,6 +151,27 @@ class ErrorDeletePostAppState extends AppStates {
   ErrorDeletePostAppState(this.error);
 }
 
+// Delete Post
+class LoadingDeleteAllLikesForPostAppState extends AppStates {}
+
+class SuccessDeleteAllLikesForPostAppState extends AppStates {}
+
+class ErrorDeleteAllLikesForPostAppState extends AppStates {
+  dynamic error;
+  ErrorDeleteAllLikesForPostAppState(this.error);
+}
+
+
+// Delete Post
+class LoadingDeleteAllCommentsForPostAppState extends AppStates {}
+
+class SuccessDeleteAllCommentsForPostAppState extends AppStates {}
+
+class ErrorDeleteAllCommentsForPostAppState extends AppStates {
+  dynamic error;
+  ErrorDeleteAllCommentsForPostAppState(this.error);
+}
+
 
 
 // Get Image Comment
@@ -261,6 +282,8 @@ class ErrorSendMessageAppState extends AppStates {
 class LoadingGetMessagesAppState extends AppStates {}
 
 class SuccessGetMessagesAppState extends AppStates {}
+
+class SuccessGetReceiverMessagesAppState extends AppStates {}
 
 class ErrorGetMessagesAppState extends AppStates {
   dynamic error;

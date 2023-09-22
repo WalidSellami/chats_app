@@ -24,8 +24,6 @@ class AppLayout extends StatefulWidget {
 
 class _AppLayoutState extends State<AppLayout> {
 
-
-
   @override
   void initState() {
     super.initState();
@@ -105,7 +103,7 @@ class _AppLayoutState extends State<AppLayout> {
                         systemNavigationBarIconBrightness: Brightness.light,
                       ),
                       actions: [
-                        if ((cubit.currentIndex == 1 || cubit.currentIndex == 3) && cubit.allUsers.isNotEmpty)
+                        if ((cubit.currentIndex == 1 || cubit.currentIndex == 3) && cubit.allUsers.length > 10)
                           IconButton(
                             onPressed: () {
                               if (checkCubit.hasInternet) {

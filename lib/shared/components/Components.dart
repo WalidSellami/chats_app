@@ -4,6 +4,7 @@ import 'package:chat/shared/adaptive/circularIndicator/CircularIndicator.dart';
 import 'package:chat/shared/adaptive/circularIndicator/CircularRingIndicator.dart';
 import 'package:chat/shared/components/Constants.dart';
 import 'package:chat/shared/cubit/appCubit/AppCubit.dart';
+import 'package:chat/shared/cubit/checkCubit/CheckCubit.dart';
 import 'package:chat/shared/cubit/themeCubit/ThemeCubit.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
@@ -200,19 +201,13 @@ Color chooseToastColor({
   required ToastStates s,
   context,
 }) {
-  Color? color;
-  switch (s) {
-    case ToastStates.success:
-      color = HexColor('009b9b');
-      break;
-    case ToastStates.error:
-      color = Colors.red;
-      break;
-    case ToastStates.warning:
-      color = Colors.amber.shade800;
-      break;
-  }
-  return color;
+
+  return switch (s) {
+    ToastStates.success => HexColor('009b9b'),
+    ToastStates.error => Colors.red,
+    ToastStates.warning => Colors.amber.shade800,
+  };
+
 }
 
 dynamic showLoading(BuildContext context) {
@@ -228,7 +223,7 @@ dynamic showLoading(BuildContext context) {
             child: Container(
                 padding: const EdgeInsets.all(26.0),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(14.0),
+                  borderRadius: BorderRadius.circular(18.0),
                   color: ThemeCubit.get(context).isDark ? HexColor('222222') : Colors.white,
                 ),
                 child: CircularIndicator(os: getOs())),
@@ -257,39 +252,40 @@ dynamic showImage(BuildContext context , String tag , image , {XFile? imageUploa
           child: Container(
             decoration: const BoxDecoration(),
             child: (imageUpload == null) ? Image.network('$image',
-             width: double.infinity,
-             height: 450.0,
+             width: MediaQuery.of(context).size.width,
+             height: MediaQuery.of(context).size.height,
              fit: BoxFit.fitWidth,
               frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+              if(frame == null) {
+                return SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: Center(child: CircularRingIndicator(os: getOs())),
+                );
+              }
                 return child;
               },
               loadingBuilder: (context, child, loadingProgress) {
                 if(loadingProgress == null) {
                   return child;
                 } else {
-                  return Container(
-                    width: double.infinity,
-                    height: 450.0,
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        width: 0.0,
-                        color: Colors.grey.shade900,
-                      ),
-                    ),
+                  return SizedBox(
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
                     child: Center(child: CircularRingIndicator(os: getOs())),
                   );
                 }
               },
               errorBuilder: (context, error, stackTrace) {
-                return const SizedBox(
-                  width: double.infinity,
-                  height: 450.0,
-                  child: Center(child:Text('Failed to load' , style: TextStyle(fontSize: 14.0,),)),
+                return SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: const Center(child:Text('Failed to load' , style: TextStyle(fontSize: 14.0,),)),
                 );
               },
             ) : Image.file(File(imageUpload.path),
-              width: double.infinity,
-              height: 450.0,
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
               fit: BoxFit.fitWidth,
             ),
           ),
@@ -340,12 +336,16 @@ dynamic showFullImageAndSave(BuildContext context , globalKey , String tag , ima
             (isMyPhotos == false) ?
             IconButton(
               onPressed: () async {
-                await saveImage(globalKey , context).then((value) {
-                  Navigator.pop(context);
-                  showFlutterToast(message: 'The image has been saved to your gallery', state: ToastStates.success, context: context);
-                }).catchError((error) {
-                  showFlutterToast(message: '$error', state: ToastStates.error, context: context);
-                });
+                if(CheckCubit.get(context).hasInternet) {
+                  await saveImage(globalKey , context).then((value) {
+                    Navigator.pop(context);
+                    showFlutterToast(message: 'The image has been saved to your gallery', state: ToastStates.success, context: context);
+                  }).catchError((error) {
+                    showFlutterToast(message: '$error', state: ToastStates.error, context: context);
+                  });
+                } else {
+                  showFlutterToast(message: 'No Internet Connection', state: ToastStates.error, context: context);
+                }
               },
               icon: Icon(
                 EvaIcons.downloadOutline,
@@ -390,16 +390,20 @@ dynamic showFullImageAndSave(BuildContext context , globalKey , String tag , ima
                 ];
               },
               onSelected: (value) async {
-                if(value == 'save') {
-                  await saveImage(globalKey , context).then((value) {
+                if(CheckCubit.get(context).hasInternet) {
+                  if(value == 'save') {
+                    await saveImage(globalKey , context).then((value) {
+                      Navigator.pop(context);
+                      showFlutterToast(message: 'The image has been saved to your gallery', state: ToastStates.success, context: context);
+                    }).catchError((error) {
+                      showFlutterToast(message: '$error', state: ToastStates.error, context: context);
+                    });
+                  } else if (value == 'remove') {
+                    AppCubit.get(context).deleteImageProfileCover(image);
                     Navigator.pop(context);
-                    showFlutterToast(message: 'The image has been saved to your gallery', state: ToastStates.success, context: context);
-                  }).catchError((error) {
-                    showFlutterToast(message: '$error', state: ToastStates.error, context: context);
-                  });
-                } else if (value == 'remove') {
-                  AppCubit.get(context).deleteImageProfileCover(image);
-                  Navigator.pop(context);
+                  }
+                } else {
+                  showFlutterToast(message: 'Noo Internet Connection', state: ToastStates.error, context: context);
                 }
               },
             ),
@@ -420,34 +424,35 @@ dynamic showFullImageAndSave(BuildContext context , globalKey , String tag , ima
                 child: Container(
                   decoration: const BoxDecoration(),
                   child: Image.network('$image',
-                    width: double.infinity,
-                    height: 450.0,
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
                     fit: BoxFit.fitWidth,
                     frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                    if(frame == null) {
+                      return SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        child: Center(child: CircularRingIndicator(os: getOs())),
+                      );
+                    }
                       return child;
                     },
                     loadingBuilder: (context, child, loadingProgress) {
                       if(loadingProgress == null) {
                         return child;
                       } else {
-                        return Container(
-                          width: double.infinity,
-                          height: 450.0,
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              width: 0.0,
-                              color: Colors.grey.shade900,
-                            ),
-                          ),
+                        return SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          height: MediaQuery.of(context).size.height,
                           child: Center(child: CircularRingIndicator(os: getOs())),
                         );
                       }
                     },
                     errorBuilder: (context, error, stackTrace) {
-                      return const SizedBox(
-                        width: double.infinity,
-                        height: 450.0,
-                        child: Center(child:Text('Failed to load' , style: TextStyle(fontSize: 14.0,),)),
+                      return SizedBox(
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height,
+                        child: const Center(child:Text('Failed to load' , style: TextStyle(fontSize: 14.0,),)),
                       );
                     },
                   ),),

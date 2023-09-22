@@ -46,44 +46,6 @@ class LoginCubit extends Cubit<LoginStates> {
   }
 
 
-  // You have a google account in firestore
-  Future<void> signInWithGoogleAccount() async {
-    emit(LoadingGoogleLoginState());
-    // Trigger the authentication flow
-    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-
-    // Obtain the auth details from the request
-    final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
-
-    // Create a new credential
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth?.accessToken,
-      idToken: googleAuth?.idToken,
-    );
-
-    // Once signed in, return the UserCredential
-    FirebaseAuth.instance.signInWithCredential(credential).then((value) async {
-
-      var deviceToken = await getDeviceToken();
-
-      FirebaseFirestore.instance.collection('users').doc(value.user?.uid).update({
-        'device_token': deviceToken,
-      });
-
-      CacheHelper.saveData(key: 'isGoogleSignIn', value: true);
-
-
-      emit(SuccessGoogleLoginState(value.user?.uid));
-
-    }).catchError((error) {
-
-      emit(ErrorGoogleLoginState(error));
-    });
-  }
-
-
-
-  // You don't have a google account in firestore (the first login with google)
   Future<void> signInWithGoogle() async {
     emit(LoadingGoogleLoginState());
 
@@ -92,6 +54,11 @@ class LoginCubit extends Cubit<LoginStates> {
 
     // Obtain the auth details from the request
     final GoogleSignInAuthentication? googleAuth = await googleUser?.authentication;
+
+
+    // if(googleAuth == null) {
+    //   emit(ErrorGoogleLoginState('Error, failed to login'));
+    // }
 
     // Create a new credential
     final credential = GoogleAuthProvider.credential(

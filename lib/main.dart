@@ -25,10 +25,6 @@ import 'firebase_options.dart';
 // Notification background
 Future<void> handleBackgroundMessage(RemoteMessage message) async {
 
-  if (kDebugMode) {
-    print(message.data);
-  }
-
   Data data = Data.fromJson(message.data);
 
   if((data.title != null) && (data.message != null)) {
@@ -111,7 +107,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (BuildContext context) => AppCubit()..getUserProfile()),
+        BlocProvider(create: (BuildContext context) => AppCubit()),
         BlocProvider(create: (BuildContext context) => LoginCubit()),
         BlocProvider(create: (BuildContext context) => RegisterCubit()),
         BlocProvider(create: (BuildContext context) => CheckCubit()..checkConnection(context)),

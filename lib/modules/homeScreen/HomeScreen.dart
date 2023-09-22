@@ -15,6 +15,7 @@ import 'package:chat/shared/cubit/themeCubit/ThemeCubit.dart';
 import 'package:conditional_builder_null_safety/conditional_builder_null_safety.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
 
@@ -174,7 +175,9 @@ class _HomeScreenState extends State<HomeScreen> {
               if(post.uId == uId)
               IconButton(
                   onPressed: () {
-                    AppCubit.get(context).deletePost(postId: postId , postImage: post.imagePost);
+                    AppCubit.get(context).getPostComments(postId: postId);
+                    AppCubit.get(context).getUsersLikes(postId: postId);
+                    showAlertRemove(context, postId, post.imagePost);
                   },
                   icon: const Icon(
                     Icons.close_rounded,
@@ -426,6 +429,64 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     ),
   );
+
+}
+
+
+dynamic showAlertRemove(context, postId, postImage) {
+
+  return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        HapticFeedback.vibrate();
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0,),
+          ),
+          title: const Text(
+            'Do you to remove this post ?',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text(
+                  'No',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+            ),
+            TextButton(
+                onPressed: () {
+                  if(CheckCubit.get(context).hasInternet) {
+                    AppCubit.get(context).deletePost(postId: postId, postImage: postImage);
+                    Navigator.pop(context);
+                  } else {
+                    showFlutterToast(message: 'No Internet Connection', state: ToastStates.error, context: context);
+                    Navigator.pop(context);
+                  }
+                },
+                child: Text(
+                  'Yes',
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    color: HexColor('f9325f'),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+            ),
+          ],
+        );
+
+      });
 
 
 }

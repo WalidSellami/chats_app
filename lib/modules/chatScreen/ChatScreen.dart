@@ -29,7 +29,9 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Builder(
       builder: (context) {
-        AppCubit.get(context).getAllUsers();
+        if(CheckCubit.get(context).hasInternet) {
+          AppCubit.get(context).getAllUsers();
+        }
         return BlocConsumer<CheckCubit , CheckStates>(
           listener: (context , state) {},
           builder: (context , state) {

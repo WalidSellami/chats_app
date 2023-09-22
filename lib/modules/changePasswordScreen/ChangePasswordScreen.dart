@@ -188,18 +188,17 @@ class _ChangePasswordsScreenState extends State<ChangePasswordsScreen> {
                             child: defaultButton(
                                 text: 'Change'.toUpperCase(),
                                 onPress: () {
+                                  focusNode1.unfocus();
+                                  focusNode2.unfocus();
                                   if(checkCubit.hasInternet) {
                                     if(formKey.currentState!.validate()) {
                                       cubit.changePassword(
                                           oldPassword: oldPasswordController.text,
                                           newPassword: newPasswordController.text);
-                                      // formKey.currentState?.save();
                                     }
                                   } else {
                                     showFlutterToast(message: 'No Internet Connection', state: ToastStates.error, context: context);
                                   }
-                                  focusNode1.unfocus();
-                                  focusNode2.unfocus();
                                 },
                                 context: context),
                           ),

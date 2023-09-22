@@ -15,6 +15,7 @@ import 'package:chat/shared/network/local/CacheHelper.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:hexcolor/hexcolor.dart';
 
@@ -61,9 +62,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     FirebaseAuth.instance.signOut();
                     CacheHelper.removeData(key: 'uId').then((value) {
                       if(value == true) {
-                        CacheHelper.saveData(key: 'isSaved', value: true);
+                        CacheHelper.saveData(key: 'isSaved', value: true).then((value) {
+                          isSaved = true;
+                        });
                         Navigator.pop(context);
                         navigateAndNotReturn(context: context, screen: const UserAccountsScreen());
+                        AppCubit.get(context).clearMessages();
                         AppCubit.get(context).currentIndex = 0;
                       }
                     });
@@ -382,9 +386,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return showDialog(
         context: context,
         builder: (dialogContext) {
+          HapticFeedback.vibrate();
            return AlertDialog(
              shape: RoundedRectangleBorder(
-               borderRadius: BorderRadius.circular(14.0,),
+               borderRadius: BorderRadius.circular(16.0,),
              ),
              title: const Text(
                'Do you want to log out ?',

@@ -52,14 +52,6 @@ class _UserChatScreenState extends State<UserChatScreen> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollBottom();
-    });
-  }
-
 
   @override
   void dispose() {
@@ -83,13 +75,16 @@ class _UserChatScreenState extends State<UserChatScreen> {
           return BlocConsumer<AppCubit, AppStates>(
             listener: (context, state) {
               if (state is SuccessSendMessageAppState) {
+                setState(() {
+                  isVisible = false;
+                });
+                setState(() {
+                  messageController.text = '';
+                });
                 if (AppCubit.get(context).imageMessage != null) {
                   Navigator.pop(context);
                   AppCubit.get(context).clearImageMessage();
                 }
-                setState(() {
-                  isVisible = false;
-                });
               }
 
 
@@ -115,18 +110,24 @@ class _UserChatScreenState extends State<UserChatScreen> {
               var cubit = AppCubit.get(context);
               var messages = cubit.messages;
               var messageId = cubit.messagesId;
+              var receiverMessageId = cubit.receiverMessagesId;
 
-              return Scaffold(
-                appBar: defaultAppBar(
-                  onPress: () {
-                    cubit.clearMessages();
-                    Navigator.pop(context);
-                  },
-                  text: '${widget.user.userName}',
-                ),
-                body: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Form(
+              return WillPopScope(
+                onWillPop: () async {
+                  cubit.clearMessages();
+                  focusNode.unfocus();
+                  return true;
+                },
+                child: Scaffold(
+                  appBar: defaultAppBar(
+                    onPress: () {
+                      cubit.clearMessages();
+                      Navigator.pop(context);
+                      focusNode.unfocus();
+                    },
+                    text: '${widget.user.userName}',
+                  ),
+                  body: Form(
                     key: formKey,
                     child: Column(
                       children: [
@@ -134,40 +135,48 @@ class _UserChatScreenState extends State<UserChatScreen> {
                           child: (checkCubit.hasInternet)
                               ? ConditionalBuilder(
                                   condition: messages.isNotEmpty,
-                                  builder: (context) => ListView.separated(
-                                      controller: scrollController,
-                                      itemBuilder: (context, index) {
-                                        if (messages[index].senderId == uId) {
-                                          if (messages[index].messageImage != '') {
-                                            return buildItemUserSenderMessageWithImage(
-                                                messages[index],
-                                                messageId[index],
-                                                index);
+                                  builder: (context) => Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: ListView.separated(
+                                        controller: scrollController,
+                                        itemBuilder: (context, index) {
+                                          if (messages[index].senderId == uId) {
+                                            if (messages[index].messageImage != '') {
+                                              return buildItemUserSenderMessageWithImage(
+                                                  messages[index],
+                                                  messageId[index],
+                                                  receiverMessageId[index],
+                                                  index);
+                                            } else {
+                                              return buildItemUserSenderMessage(
+                                                  messages[index],
+                                                  messageId[index],
+                                                  receiverMessageId[index],
+                                                  index);
+                                            }
                                           } else {
-                                            return buildItemUserSenderMessage(
-                                                messages[index],
-                                                messageId[index],
-                                                index);
+                                            if (messages[index].messageImage !=
+                                                '') {
+                                              return buildItemUserReceiverMessageWithImage(
+                                                  messages[index],
+                                                  messageId[index],
+                                                  receiverMessageId[index],
+                                                  index);
+                                            } else {
+                                              return buildItemUserReceiverMessage(
+                                                  messages[index],
+                                                  messageId[index],
+                                                  receiverMessageId[index],
+                                              );
+                                            }
                                           }
-                                        } else {
-                                          if (messages[index].messageImage !=
-                                              '') {
-                                            return buildItemUserReceiverMessageWithImage(
-                                                messages[index],
-                                                messageId[index],
-                                                index);
-                                          } else {
-                                            return buildItemUserReceiverMessage(
-                                                messages[index],
-                                                messageId[index]);
-                                          }
-                                        }
-                                      },
-                                      separatorBuilder: (context, index) =>
-                                          const SizedBox(
-                                            height: 20.0,
-                                          ),
-                                      itemCount: messages.length),
+                                        },
+                                        separatorBuilder: (context, index) =>
+                                            const SizedBox(
+                                              height: 20.0,
+                                            ),
+                                        itemCount: messages.length),
+                                  ),
                                   fallback: (context) => (state
                                           is LoadingGetMessagesAppState)
                                       ? Center(
@@ -275,187 +284,205 @@ class _UserChatScreenState extends State<UserChatScreen> {
                         const SizedBox(
                           height: 20.0,
                         ),
-                        Row(
-                          children: [
-                            if (cubit.imageMessage == null)
-                              InkWell(
-                                borderRadius: BorderRadius.circular(
-                                  8.0,
-                                ),
-                                onTap: () {
-                                  focusNode.unfocus();
-                                  if (checkCubit.hasInternet) {
-                                    showModalBottomSheet(
-                                        context: context,
-                                        builder: (BuildContext context) {
-                                          return SafeArea(
-                                            child: Material(
-                                              color:
-                                                  ThemeCubit.get(context).isDark
-                                                      ? HexColor('171717')
-                                                      : Colors.white,
-                                              child: Wrap(
-                                                children: <Widget>[
-                                                  ListTile(
-                                                    leading: const Icon(
-                                                        Icons.camera_alt),
-                                                    title: const Text(
-                                                        'Take a new photo'),
-                                                    onTap: () async {
-                                                      cubit.getImageMessage(
-                                                          ImageSource.camera);
-                                                      Navigator.pop(context);
-                                                    },
+                        Material(
+                          elevation: 15.0,
+                          color: ThemeCubit.get(context).isDark
+                              ? HexColor('171717')
+                              : Colors.white,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                              children: [
+                                if (cubit.imageMessage == null)
+                                  InkWell(
+                                    borderRadius: BorderRadius.circular(
+                                      8.0,
+                                    ),
+                                    onTap: () {
+                                      focusNode.unfocus();
+                                      if (checkCubit.hasInternet) {
+                                        showModalBottomSheet(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              HapticFeedback.vibrate();
+                                              return SafeArea(
+                                                child: Material(
+                                                  color:
+                                                      ThemeCubit.get(context).isDark
+                                                          ? HexColor('171717')
+                                                          : Colors.white,
+                                                  child: Wrap(
+                                                    children: <Widget>[
+                                                      ListTile(
+                                                        leading: const Icon(
+                                                            Icons.camera_alt),
+                                                        title: const Text(
+                                                            'Take a new photo'),
+                                                        onTap: () async {
+                                                          cubit.getImageMessage(
+                                                              ImageSource.camera);
+                                                          Navigator.pop(context);
+                                                        },
+                                                      ),
+                                                      ListTile(
+                                                        leading: const Icon(
+                                                            Icons.photo_library),
+                                                        title: const Text(
+                                                            'Choose from gallery'),
+                                                        onTap: () async {
+                                                          cubit.getImageMessage(
+                                                              ImageSource.gallery);
+                                                          Navigator.pop(context);
+                                                        },
+                                                      ),
+                                                    ],
                                                   ),
-                                                  ListTile(
-                                                    leading: const Icon(
-                                                        Icons.photo_library),
-                                                    title: const Text(
-                                                        'Choose from gallery'),
-                                                    onTap: () async {
-                                                      cubit.getImageMessage(
-                                                          ImageSource.gallery);
-                                                      Navigator.pop(context);
-                                                    },
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          );
-                                        });
-                                  } else {
-                                    showFlutterToast(
-                                        message: 'No Internet Connection',
-                                        state: ToastStates.error,
-                                        context: context);
-                                  }
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(4.0),
-                                  child: Icon(
-                                    Icons.camera_alt_rounded,
-                                    size: 28.0,
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                  ),
-                                ),
-                              ),
-                            const SizedBox(
-                              width: 8.0,
-                            ),
-                            Expanded(
-                              child: ConstrainedBox(
-                                constraints: const BoxConstraints(
-                                  maxHeight: 120.0,
-                                ),
-                                child: TextFormField(
-                                  controller: messageController,
-                                  keyboardType: TextInputType.multiline,
-                                  maxLines: null,
-                                  focusNode: focusNode,
-                                  decoration: InputDecoration(
-                                    hintText: 'Write a message ...',
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(
-                                        30.0,
+                                                ),
+                                              );
+                                            });
+                                      } else {
+                                        showFlutterToast(
+                                            message: 'No Internet Connection',
+                                            state: ToastStates.error,
+                                            context: context);
+                                      }
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Icon(
+                                        Icons.camera_alt_rounded,
+                                        size: 28.0,
+                                        color:
+                                            Theme.of(context).colorScheme.primary,
                                       ),
                                     ),
                                   ),
-                                  onChanged: (value) {
-                                    if (value.isNotEmpty) {
-                                      setState(() {
-                                        isVisible = true;
-                                      });
-                                    } else {
-                                      setState(() {
-                                        isVisible = false;
-                                      });
-                                    }
-                                  },
+                                const SizedBox(
+                                  width: 8.0,
                                 ),
-                              ),
-                            ),
-                            const SizedBox(
-                              width: 8.0,
-                            ),
-                            Visibility(
-                              visible: isVisible,
-                              child: ConditionalBuilder(
-                                condition: state is! LoadingSendMessageAppState,
-                                builder: (context) => InkWell(
-                                  borderRadius: BorderRadius.circular(
-                                    8.0,
-                                  ),
-                                  onTap: () async {
-                                    if (checkCubit.hasInternet) {
-                                      if (formKey.currentState!.validate()) {
-                                        if (cubit.imageMessage == null) {
-                                          cubit.sendMessage(
-                                              senderId: uId,
-                                              receiverId:
-                                                  widget.user.uId.toString(),
-                                              messageText:
-                                                  messageController.text,
-                                              dateTime: Timestamp.now());
-
-                                          cubit.sendNotification(
-                                              title:
-                                                  (cubit.userProfile?.userName)
-                                                      .toString(),
-                                              body: messageController.text,
-                                              token: widget.user.deviceToken
-                                                  .toString());
-                                        } else {
-                                          showLoading(context);
-                                          cubit.uploadImageMessage(
-                                              senderId: uId,
-                                              receiverId:
-                                                  widget.user.uId.toString(),
-                                              messageText:
-                                                  messageController.text,
-                                              dateTime: Timestamp.now());
-
-                                          await Future.delayed(const Duration(milliseconds: 800)).then((value) async {
-                                            await cubit.sendNotification(
-                                                title:
-                                                (cubit.userProfile?.userName)
-                                                    .toString(),
-                                                body: (messageController
-                                                    .text.isEmpty)
-                                                    ? 'Sent a photo'
-                                                    : messageController.text,
-                                                token: widget.user.deviceToken
-                                                    .toString());
+                                Expanded(
+                                  child: ConstrainedBox(
+                                    constraints: const BoxConstraints(
+                                      maxHeight: 120.0,
+                                    ),
+                                    child: TextFormField(
+                                      controller: messageController,
+                                      keyboardType: TextInputType.multiline,
+                                      maxLines: null,
+                                      focusNode: focusNode,
+                                      decoration: InputDecoration(
+                                        hintText: 'Write a message ...',
+                                        border: OutlineInputBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            30.0,
+                                          ),
+                                        ),
+                                      ),
+                                      onChanged: (value) {
+                                        if (value.isNotEmpty) {
+                                          setState(() {
+                                            isVisible = true;
                                           });
-
+                                        } else {
+                                          setState(() {
+                                            isVisible = false;
+                                          });
                                         }
-
-                                        setState(() {
-                                          messageController.text = '';
-                                        });
-                                      }
-                                    } else {
-                                      showFlutterToast(
-                                          message: 'No Internet Connection',
-                                          state: ToastStates.error,
-                                          context: context);
-                                    }
-                                  },
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: Icon(
-                                      Icons.send_rounded,
-                                      size: 28.0,
-                                      color:
-                                          Theme.of(context).colorScheme.primary,
+                                      },
                                     ),
                                   ),
                                 ),
-                                fallback: (context) =>
-                                    CircularRingIndicator(os: getOs()),
-                              ),
+                                const SizedBox(
+                                  width: 8.0,
+                                ),
+                                Visibility(
+                                  visible: isVisible,
+                                  child: ConditionalBuilder(
+                                    condition: state is! LoadingSendMessageAppState,
+                                    builder: (context) => InkWell(
+                                      borderRadius: BorderRadius.circular(
+                                        8.0,
+                                      ),
+                                      onTap: () async {
+                                        if (checkCubit.hasInternet) {
+                                          if (formKey.currentState!.validate()) {
+                                            if (cubit.imageMessage == null) {
+
+                                              if(messageController.text != '' || messageController.text.isNotEmpty) {
+
+                                                cubit.sendMessage(
+                                                    senderId: uId,
+                                                    receiverId:
+                                                    widget.user.uId.toString(),
+                                                    messageText:
+                                                    messageController.text,
+                                                    dateTime: Timestamp.now());
+
+                                                cubit.sendNotification(
+                                                    title:
+                                                    (cubit.userProfile?.userName)
+                                                        .toString(),
+                                                    body: messageController.text,
+                                                    token: widget.user.deviceToken
+                                                        .toString());
+
+                                              } else {
+
+                                                showFlutterToast(message: 'Write something ...', state: ToastStates.error, context: context);
+
+                                              }
+
+                                            } else {
+
+                                              showLoading(context);
+
+                                              cubit.uploadImageMessage(
+                                                  senderId: uId,
+                                                  receiverId:
+                                                      widget.user.uId.toString(),
+                                                  messageText:
+                                                      messageController.text,
+                                                  dateTime: Timestamp.now());
+
+                                              await Future.delayed(const Duration(milliseconds: 800)).then((value) async {
+                                                await cubit.sendNotification(
+                                                    title:
+                                                    (cubit.userProfile?.userName)
+                                                        .toString(),
+                                                    body: (messageController
+                                                        .text.isEmpty)
+                                                        ? 'Sent a photo'
+                                                        : messageController.text,
+                                                    token: widget.user.deviceToken
+                                                        .toString());
+                                              });
+
+                                            }
+                                          }
+                                        } else {
+                                          showFlutterToast(
+                                              message: 'No Internet Connection',
+                                              state: ToastStates.error,
+                                              context: context);
+                                        }
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: Icon(
+                                          Icons.send_rounded,
+                                          size: 28.0,
+                                          color:
+                                              Theme.of(context).colorScheme.primary,
+                                        ),
+                                      ),
+                                    ),
+                                    fallback: (context) =>
+                                        CircularRingIndicator(os: getOs()),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ],
                     ),
@@ -469,12 +496,16 @@ class _UserChatScreenState extends State<UserChatScreen> {
     });
   }
 
-  Widget buildItemUserSenderMessage(MessageModel model, messageId, index) =>
+  Widget buildItemUserSenderMessage(MessageModel model, messageId, receiverMessageId, index) =>
       Align(
         alignment: Alignment.centerRight,
         child: GestureDetector(
           onLongPress: () {
-            showAlert(context, messageId, model.messageImage);
+            if(CheckCubit.get(context).hasInternet) {
+              showRemoveOptions(model.receiverId, messageId, receiverMessageId, model.messageImage);
+            } else {
+              showFlutterToast(message: 'No Internet Connection', state: ToastStates.error, context: context);
+            }
           },
           child: Container(
             padding: const EdgeInsets.all(
@@ -508,10 +539,14 @@ class _UserChatScreenState extends State<UserChatScreen> {
       );
 
   Widget buildItemUserSenderMessageWithImage(
-          MessageModel model, messageId, index) =>
+          MessageModel model, messageId, receiverMessageId, index) =>
       GestureDetector(
         onLongPress: () {
-          showAlert(context, messageId, model.messageImage);
+          if(CheckCubit.get(context).hasInternet) {
+            showRemoveOptions(model.receiverId, messageId, receiverMessageId, model.messageImage);
+          } else {
+            showFlutterToast(message: 'No Internet Connection', state: ToastStates.error, context: context);
+          }
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
@@ -633,11 +668,15 @@ class _UserChatScreenState extends State<UserChatScreen> {
         ),
       );
 
-  Widget buildItemUserReceiverMessage(MessageModel model, messageId) => Align(
+  Widget buildItemUserReceiverMessage(MessageModel model, messageId, receiverMessageId) => Align(
         alignment: Alignment.centerLeft,
         child: GestureDetector(
           onLongPress: () {
-            showAlert(context, messageId, model.messageImage);
+            if(CheckCubit.get(context).hasInternet) {
+              showRemoveOptions(model.receiverId, messageId, receiverMessageId, model.messageImage);
+            } else {
+              showFlutterToast(message: 'No Internet Connection', state: ToastStates.error, context: context);
+            }
           },
           child: Container(
             padding: const EdgeInsets.all(
@@ -671,10 +710,14 @@ class _UserChatScreenState extends State<UserChatScreen> {
       );
 
   Widget buildItemUserReceiverMessageWithImage(
-          MessageModel model, messageId, index) =>
+          MessageModel model, messageId, receiverMessageId, index) =>
       GestureDetector(
         onLongPress: () {
-          showAlert(context, messageId, model.messageImage);
+          if(CheckCubit.get(context).hasInternet) {
+            showRemoveOptions(model.receiverId, messageId, receiverMessageId, model.messageImage);
+          } else {
+            showFlutterToast(message: 'No Internet Connection', state: ToastStates.error, context: context);
+          }
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -796,58 +839,73 @@ class _UserChatScreenState extends State<UserChatScreen> {
         ),
       );
 
-  dynamic showAlert(BuildContext context, messageId, messageImage) {
-    return showDialog(
-      context: context,
-      builder: (context) {
-        HapticFeedback.vibrate(); // Vibrate the phone
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(
-              14.0,
-            ),
-          ),
-          title: const Text(
-            'Do you want to remove this message ?',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 18.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text(
-                'No',
-                style: TextStyle(
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
+
+
+  dynamic showRemoveOptions(receiverId, messageId, receiverMessageId, messageImage) {
+    return showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          HapticFeedback.vibrate();
+          focusNode.unfocus();
+          return SafeArea(
+            child: Material(
+              color:
+              ThemeCubit.get(context).isDark
+                  ? HexColor('171717')
+                  : Colors.white,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  vertical: 8.0,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: <Widget>[
+                    const Text(
+                      'Who do you want to remove this message for ?',
+                      style: TextStyle(
+                        fontSize: 12.0,
+                      ),
+                    ),
+                    const SizedBox(
+                      height: 4.0,
+                    ),
+                    ListTile(
+                      leading: const Icon(
+                          Icons.delete_rounded),
+                      title: const Text(
+                          'UnSend'),
+                      onTap: () async {
+                        AppCubit.get(context).deleteMessage(
+                            receiverId: receiverId,
+                            messageId: messageId,
+                            receiverMessageId: receiverMessageId,
+                            messageImage: messageImage,
+                            isUnSend: true,
+                        );
+                        Navigator.pop(context);
+                      },
+                    ),
+                    ListTile(
+                      leading: const Icon(
+                          Icons.delete_rounded),
+                      title: const Text(
+                          'Remove for you'),
+                      onTap: () async {
+                        AppCubit.get(context).deleteMessage(
+                            receiverId: receiverId,
+                            messageId: messageId,
+                            receiverMessageId: receiverMessageId,
+                            messageImage: messageImage,
+                        );
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
                 ),
               ),
             ),
-            TextButton(
-              onPressed: () {
-                AppCubit.get(context).deleteMessage(
-                    receiverId: widget.user.uId.toString(),
-                    messageId: messageId,
-                    messageImage: messageImage);
-                Navigator.pop(context);
-              },
-              child: Text(
-                'Yes',
-                style: TextStyle(
-                  color: HexColor('f9325f'),
-                  fontSize: 16.0,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
+          );
+        });
   }
+
 }
