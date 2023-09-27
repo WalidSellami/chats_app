@@ -92,22 +92,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           TextButton(
                             onPressed: () {
                               if(checkCubit.hasInternet) {
+                                focusNode1.unfocus();
+                                focusNode2.unfocus();
+                                focusNode3.unfocus();
                                 if (cubit.imageProfile != null) {
                                   cubit.uploadImageProfile(
                                       userName: nameController.text,
                                       bio: bioController.text,
                                       phone: phoneController.text);
-                                  focusNode1.unfocus();
-                                  focusNode2.unfocus();
-                                  focusNode3.unfocus();
                                 } else if (cubit.imageCover != null) {
                                   cubit.uploadImageCover(
                                       userName: nameController.text,
                                       bio: bioController.text,
                                       phone: phoneController.text);
-                                  focusNode1.unfocus();
-                                  focusNode2.unfocus();
-                                  focusNode3.unfocus();
                                 }
                               } else {
                                 showFlutterToast(message: 'No Internet Connection', state: ToastStates.error, context: context);
@@ -159,10 +156,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                               width: double.infinity,
                                               height: 180.0,
                                               fit: BoxFit.cover,
-                                              frameBuilder: (context,
-                                                  child,
-                                                  frame,
-                                                  wasSynchronouslyLoaded) {
+                                              frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                                                if(frame == null) {
+                                                  return Container(
+                                                    width: double.infinity,
+                                                    height: 180.0,
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                        width: 0.0,
+                                                        color: Colors
+                                                            .grey.shade900,
+                                                      ),
+                                                    ),
+                                                    child: Center(
+                                                        child:
+                                                        CircularRingIndicator(
+                                                            os: getOs())),
+                                                  );
+
+                                                }
                                                 return child;
                                               },
                                               loadingBuilder: (context, child,
@@ -176,8 +188,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                                     decoration: BoxDecoration(
                                                       border: Border.all(
                                                         width: 0.0,
-                                                        color: Colors
-                                                            .grey.shade900,
+                                                        color: themeCubit.isDark ? Colors.white : Colors.grey.shade900,
                                                       ),
                                                     ),
                                                     child: Center(
@@ -207,6 +218,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                               width: double.infinity,
                                               height: 180.0,
                                               fit: BoxFit.cover,
+                                              frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                                                if(frame == null) {
+                                                  return Container(
+                                                    width: double.infinity,
+                                                    height: 180.0,
+                                                    decoration: BoxDecoration(
+                                                      border: Border.all(
+                                                        width: 0.0,
+                                                        color: themeCubit.isDark ? Colors.white : Colors.grey.shade900,
+                                                      ),
+                                                    ),
+                                                    child: Center(
+                                                        child:
+                                                        CircularRingIndicator(
+                                                            os: getOs())),
+                                                  );
+                                                }
+                                                return child;
+                                              },
                                             ),
                                           ),
                                         ),
@@ -234,6 +264,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                             child: IconButton(
                                               onPressed: () {
                                                 if(checkCubit.hasInternet) {
+                                                  focusNode1.unfocus();
+                                                  focusNode2.unfocus();
+                                                  focusNode3.unfocus();
                                                   if ((cubit.imageCover == null) &&
                                                       (cubit.imageProfile == null)) {
                                                     showModalBottomSheet(
@@ -326,7 +359,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         child: Container(
                                           decoration: const BoxDecoration(),
                                           child: CircleAvatar(
-                                            radius: 62.0,
+                                            radius: 63.0,
                                             backgroundColor: themeCubit.isDark
                                                 ? Colors.white
                                                 : Colors.black,
@@ -370,6 +403,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                                         child: IconButton(
                                           onPressed: () {
                                             if(checkCubit.hasInternet) {
+                                              focusNode1.unfocus();
+                                              focusNode2.unfocus();
+                                              focusNode3.unfocus();
                                               if ((cubit.imageProfile == null) &&
                                                   (cubit.imageCover == null)) {
                                                 showModalBottomSheet(

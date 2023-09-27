@@ -56,6 +56,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
   @override
   void dispose() {
     scrollController.dispose();
+    messageController.dispose();
     super.dispose();
   }
 
@@ -379,7 +380,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                         ),
                                       ),
                                       onChanged: (value) {
-                                        if (value.isNotEmpty) {
+                                        if ((value.isNotEmpty) && (value.trim().isNotEmpty)) {
                                           setState(() {
                                             isVisible = true;
                                           });
@@ -408,8 +409,6 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                           if (formKey.currentState!.validate()) {
                                             if (cubit.imageMessage == null) {
 
-                                              if(messageController.text != '' || messageController.text.isNotEmpty) {
-
                                                 cubit.sendMessage(
                                                     senderId: uId,
                                                     receiverId:
@@ -425,12 +424,6 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                                     body: messageController.text,
                                                     token: widget.user.deviceToken
                                                         .toString());
-
-                                              } else {
-
-                                                showFlutterToast(message: 'Write something ...', state: ToastStates.error, context: context);
-
-                                              }
 
                                             } else {
 

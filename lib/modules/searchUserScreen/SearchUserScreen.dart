@@ -107,6 +107,8 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
                       child: (checkCubit.hasInternet) ? ConditionalBuilder(
                         condition: users.isNotEmpty,
                         builder: (context) => ListView.separated(
+                          physics: const BouncingScrollPhysics(),
+                            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                             itemBuilder: (context , index) => buildItemSearchUser(users[index], context),
                             separatorBuilder: (context , index) => Padding(
                               padding: const EdgeInsets.symmetric(

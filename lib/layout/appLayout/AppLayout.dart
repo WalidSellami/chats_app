@@ -127,120 +127,126 @@ class _AppLayoutState extends State<AppLayout> {
                       ],
                     ),
                     body: cubit.screens[cubit.currentIndex],
-                    bottomNavigationBar: Container(
+                    bottomNavigationBar: Material(
+                      elevation: 5.0,
                       color: themeCubit.isDark
                           ? HexColor('1a1a1a')
                           : HexColor('f2f7fc'),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8.0,
-                          vertical: 8.0,
-                        ),
-                        child: SalomonBottomBar(
-                          selectedItemColor:
-                              Theme.of(context).colorScheme.primary,
-                          curve: Curves.easeIn,
-                          duration: const Duration(milliseconds: 200),
-                          items: [
-                            SalomonBottomBarItem(
-                              icon: const Icon(
-                                EvaIcons.homeOutline,
-                                size: 26.0,
-                              ),
-                              title: const Text(''),
-                              activeIcon: const Icon(
-                                EvaIcons.home,
-                                size: 28.0,
-                              ),
-                            ),
-                            SalomonBottomBarItem(
-                              icon: SizedBox(
-                                height: 32.0,
-                                child: Stack(
-                                  alignment: Alignment.topRight,
-                                  children: [
-                                    const Align(
-                                      alignment: Alignment.center,
-                                      child: Icon(
-                                        EvaIcons.messageCircleOutline,
-                                        size: 26.0,
-                                      ),
-                                    ),
-                                    (cubit.numberNotice > 0) ? Badge(
-                                      backgroundColor: Colors.red,
-                                      textColor: Colors.white,
-                                      largeSize: 14,
-                                      alignment: Alignment.topRight,
-                                      label: Text(
-                                        (cubit.numberNotice <= 99) ? '${cubit.numberNotice}' : '+99',
-                                        style: const TextStyle(
-                                          fontSize: 8.0,
-                                        ),
-                                      ),
-                                    ) : Container(),
-                                  ],
-                                ),
-                              ),
-                              title: const Text(''),
-                              activeIcon: SizedBox(
-                                height: 35.0,
-                                child: Stack(
-                                  alignment: Alignment.topRight,
-                                  children: [
-                                    const Align(
-                                      alignment: Alignment.center,
-                                      child: Icon(
-                                        EvaIcons.messageCircle,
-                                        size: 28.0,
-                                      ),
-                                    ),
-                                    (cubit.numberNotice > 0) ? Badge(
-                                      backgroundColor: Colors.red,
-                                      textColor: Colors.white,
-                                      largeSize: 14,
-                                      alignment: Alignment.topRight,
-                                      label: Text(
-                                        (cubit.numberNotice <= 99) ? '${cubit.numberNotice}' : '+99',
-                                        style: const TextStyle(
-                                          fontSize: 8.0,
-                                        ),
-                                      ),
-                                    ) : Container(),
-                                  ],
-                                ),
-                              ),
-                            ),
-                            SalomonBottomBarItem(
-                              icon: const Icon(
-                                Icons.add_circle_rounded,
-                                size: 35.0,
-                              ),
-                              title: const Text(''),
-                            ),
-                            SalomonBottomBarItem(
+                      child: Container(
+                        color: themeCubit.isDark
+                            ? HexColor('1a1a1a')
+                            : HexColor('f2f7fc'),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8.0,
+                            vertical: 8.0,
+                          ),
+                          child: SalomonBottomBar(
+                            selectedItemColor:
+                                Theme.of(context).colorScheme.primary,
+                            curve: Curves.easeIn,
+                            duration: const Duration(milliseconds: 200),
+                            items: [
+                              SalomonBottomBarItem(
                                 icon: const Icon(
-                                  EvaIcons.peopleOutline,
+                                  EvaIcons.homeOutline,
                                   size: 26.0,
                                 ),
                                 title: const Text(''),
                                 activeIcon: const Icon(
-                                  EvaIcons.people,
+                                  EvaIcons.home,
                                   size: 28.0,
-                                )),
-                            SalomonBottomBarItem(
-                              icon: const Icon(
-                                EvaIcons.settingsOutline,
-                                size: 26.0,
+                                ),
                               ),
-                              title: const Text(''),
-                              activeIcon: const Icon(
-                                EvaIcons.settings,
-                                size: 28.0,
+                              SalomonBottomBarItem(
+                                icon: SizedBox(
+                                  height: 32.0,
+                                  child: Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      const Align(
+                                        alignment: Alignment.center,
+                                        child: Icon(
+                                          EvaIcons.messageCircleOutline,
+                                          size: 26.0,
+                                        ),
+                                      ),
+                                      (cubit.numberNotice > 0) ? Badge(
+                                        backgroundColor: Colors.red,
+                                        textColor: Colors.white,
+                                        largeSize: 14,
+                                        alignment: Alignment.topRight,
+                                        label: Text(
+                                          (cubit.numberNotice <= 99) ? '${cubit.numberNotice}' : '+99',
+                                          style: const TextStyle(
+                                            fontSize: 8.0,
+                                          ),
+                                        ),
+                                      ) : Container(),
+                                    ],
+                                  ),
+                                ),
+                                title: const Text(''),
+                                activeIcon: SizedBox(
+                                  height: 35.0,
+                                  child: Stack(
+                                    alignment: Alignment.topRight,
+                                    children: [
+                                      const Align(
+                                        alignment: Alignment.center,
+                                        child: Icon(
+                                          EvaIcons.messageCircle,
+                                          size: 28.0,
+                                        ),
+                                      ),
+                                      (cubit.numberNotice > 0) ? Badge(
+                                        backgroundColor: Colors.red,
+                                        textColor: Colors.white,
+                                        largeSize: 14,
+                                        alignment: Alignment.topRight,
+                                        label: Text(
+                                          (cubit.numberNotice <= 99) ? '${cubit.numberNotice}' : '+99',
+                                          style: const TextStyle(
+                                            fontSize: 8.0,
+                                          ),
+                                        ),
+                                      ) : Container(),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
-                          currentIndex: cubit.currentIndex,
-                          onTap: (index) => cubit.changeBottomNav(index),
+                              SalomonBottomBarItem(
+                                icon: const Icon(
+                                  Icons.add_circle_rounded,
+                                  size: 35.0,
+                                ),
+                                title: const Text(''),
+                              ),
+                              SalomonBottomBarItem(
+                                  icon: const Icon(
+                                    EvaIcons.peopleOutline,
+                                    size: 26.0,
+                                  ),
+                                  title: const Text(''),
+                                  activeIcon: const Icon(
+                                    EvaIcons.people,
+                                    size: 28.0,
+                                  )),
+                              SalomonBottomBarItem(
+                                icon: const Icon(
+                                  EvaIcons.settingsOutline,
+                                  size: 26.0,
+                                ),
+                                title: const Text(''),
+                                activeIcon: const Icon(
+                                  EvaIcons.settings,
+                                  size: 28.0,
+                                ),
+                              ),
+                            ],
+                            currentIndex: cubit.currentIndex,
+                            onTap: (index) => cubit.changeBottomNav(index),
+                          ),
                         ),
                       ),
                     ),

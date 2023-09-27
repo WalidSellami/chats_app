@@ -68,7 +68,6 @@ Widget defaultFormField({
   IconData? suffixIcon,
   bool isPassword = false,
   String? Function(String?)? onSubmit,
-  String? Function(String?)? onChange,
   Function? onPress,
 }) =>
     TextFormField(
@@ -80,7 +79,9 @@ Widget defaultFormField({
         fontWeight: FontWeight.bold,
       ),
       onFieldSubmitted: (v) {
-        onSubmit!(v);
+        if(v.isNotEmpty) {
+          onSubmit!(v);
+        }
       },
       validator: validate,
       decoration: InputDecoration(
@@ -403,7 +404,7 @@ dynamic showFullImageAndSave(BuildContext context , globalKey , String tag , ima
                     Navigator.pop(context);
                   }
                 } else {
-                  showFlutterToast(message: 'Noo Internet Connection', state: ToastStates.error, context: context);
+                  showFlutterToast(message: 'No Internet Connection', state: ToastStates.error, context: context);
                 }
               },
             ),

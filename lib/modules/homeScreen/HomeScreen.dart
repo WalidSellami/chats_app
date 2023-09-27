@@ -206,13 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
           if(post.tagPost != '')
             Wrap(
             children: [
-              (post.tagPost?.substring(0,1) != '#') ? Text(
-                '#${post.tagPost}',
-                style: TextStyle(
-                  color: Colors.blue.shade700,
-                  fontWeight: FontWeight.bold,
-                ),
-              ) : Text(
+              Text(
                 '${post.tagPost}',
                 style: TextStyle(
                   color: Colors.blue.shade700,

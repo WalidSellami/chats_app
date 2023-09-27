@@ -86,7 +86,7 @@ class _PhotosScreenState extends State<PhotosScreen> {
                               ? Center(child: CircularIndicator(os: getOs()))
                               : const Center(
                             child: Text(
-                              'There is no photos uploaded for profile and cover',
+                              'There is no photos uploaded\n for profile and cover',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 17.0,

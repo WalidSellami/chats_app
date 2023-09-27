@@ -61,6 +61,7 @@ class _UsersScreenState extends State<UsersScreen> {
                         return Future<void>.delayed(const Duration(seconds: 2));
                       },
                       child: ListView.separated(
+                        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                         itemBuilder: (context , index) => buildItemUser(users[index] , context),
                         separatorBuilder: (context , index) => Padding(
                           padding: const EdgeInsets.symmetric(

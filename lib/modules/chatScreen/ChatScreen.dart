@@ -84,6 +84,7 @@ class _ChatScreenState extends State<ChatScreen> {
                               return Future<void>.delayed(const Duration(seconds: 2));
                             },
                             child: ListView.separated(
+                              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
                               itemBuilder: (context , index) {
                                 return buildItemUser(users[index] , userProfile , context);
                               },

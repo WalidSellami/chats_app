@@ -112,6 +112,20 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           height: 180.0,
                                           fit: BoxFit.cover,
                                           frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                                           if(frame == null) {
+                                             return Container(
+                                               width: double.infinity,
+                                               height: 180.0,
+                                               decoration: BoxDecoration(
+                                                 border: Border.all(
+                                                   width: 0.0,
+                                                   color: themeCubit.isDark ? Colors.white : Colors.grey.shade900,
+                                                 ),
+                                               ),
+                                               child: Center(child: CircularRingIndicator(os: getOs())),
+                                             );
+
+                                           }
                                             return child;
                                           },
                                           loadingBuilder: (context, child, loadingProgress) {
@@ -124,7 +138,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                 decoration: BoxDecoration(
                                                   border: Border.all(
                                                     width: 0.0,
-                                                    color: Colors.grey.shade900,
+                                                    color: themeCubit.isDark ? Colors.white : Colors.grey.shade900,
                                                   ),
                                                 ),
                                                 child: Center(child: CircularRingIndicator(os: getOs())),
@@ -152,7 +166,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     child: Container(
                                       decoration: const BoxDecoration(),
                                       child: CircleAvatar(
-                                        radius: 62.0,
+                                        radius: 63.0,
                                         backgroundColor: themeCubit.isDark ? Colors.white : Colors.black,
                                         child: CircleAvatar(
                                           radius: 60.0,

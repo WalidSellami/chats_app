@@ -44,6 +44,13 @@ class _PostScreenState extends State<PostScreen> {
   }
 
   @override
+  void dispose() {
+    textController.dispose();
+    tagController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     bool isOut = MediaQuery.of(context).viewInsets.bottom == 0;
     return BlocConsumer<CheckCubit , CheckStates>(
@@ -149,257 +156,275 @@ class _PostScreenState extends State<PostScreen> {
                             ),
                           ]),
                       body: SingleChildScrollView(
-                        child: ConstrainedBox(
-                          constraints: BoxConstraints(
-                            minHeight: constraints.maxHeight,
-                          ),
-                          child: IntrinsicHeight(
-                            child: Padding(
-                              padding: const EdgeInsets.all(20.0),
-                              child: Column(
+                        physics: const BouncingScrollPhysics(),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            children: [
+                              Row(
                                 children: [
-                                  Row(
+                                  CircleAvatar(
+                                    radius: 24.0,
+                                    backgroundColor:
+                                    Theme.of(context).colorScheme.primary,
+                                    backgroundImage: NetworkImage(
+                                        '${userProfile?.imageProfile}'),
+                                  ),
+                                  const SizedBox(
+                                    width: 20.0,
+                                  ),
+                                  Text(
+                                    '${userProfile?.userName}',
+                                    style: const TextStyle(
+                                      fontSize: 17.0,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 20.0,
+                              ),
+                              TextFormField(
+                                controller: textController,
+                                maxLines: null,
+                                focusNode: focusNode1,
+                                keyboardType: TextInputType.multiline,
+                                decoration: const InputDecoration(
+                                  hintText: 'Write something ...',
+                                  // suffixIcon: textController.text.isNotEmpty
+                                  //     ? CircleAvatar(
+                                  //   radius: 20.0,
+                                  //   backgroundColor: Theme.of(context)
+                                  //       .colorScheme
+                                  //       .primary,
+                                  //   child: IconButton(
+                                  //     onPressed: () {
+                                  //       setState(() {
+                                  //         textController.text = '';
+                                  //         tagController.text = '';
+                                  //       });
+                                  //     },
+                                  //     icon: const Icon(
+                                  //       Icons.close_rounded,
+                                  //       color: Colors.white,
+                                  //     ),
+                                  //   ),
+                                  // )
+                                  //     : null,
+                                  border: InputBorder.none,
+                                ),
+                              ),
+                              const SizedBox(
+                                height: 40.0,
+                              ),
+                              if (textController.text.isNotEmpty)
+                                TextFormField(
+                                  controller: tagController,
+                                  focusNode: focusNode2,
+                                  maxLines: null,
+                                  keyboardType: TextInputType.text,
+                                  decoration: const InputDecoration(
+                                    hintMaxLines: 4,
+                                    hintText:
+                                    'Add tag or tags if you want ... \n(start with # and separate theme with , \n  and white space) '
+                                        '\n--> (like this :  #test, #test)',
+                                    hintStyle: TextStyle(
+                                      fontSize: 13.6,
+                                    ),
+                                    // suffixIcon: tagController.text.isNotEmpty
+                                    //     ? CircleAvatar(
+                                    //   radius: 20.0,
+                                    //   backgroundColor: Theme.of(context)
+                                    //       .colorScheme
+                                    //       .primary,
+                                    //   child: IconButton(
+                                    //     onPressed: () {
+                                    //       setState(() {
+                                    //         tagController.text = '';
+                                    //       });
+                                    //     },
+                                    //     icon: const Icon(
+                                    //       Icons.close_rounded,
+                                    //       color: Colors.white,
+                                    //     ),
+                                    //   ),
+                                    // )
+                                    //     : null,
+                                    border: InputBorder.none,
+                                  ),
+                                  onChanged: (value) {
+                                    tagController.text = value.split(', ').map((word) {
+                                      if (word.isNotEmpty && word.trim().isNotEmpty) {
+                                        if(!word.startsWith('#')) {
+                                          return '#$word';
+                                        } else {
+                                          return word;
+                                        }
+                                      } else {
+                                        return word;
+                                      }
+                                    }).join(', ');
+                                  },
+                                ),
+                              const SizedBox(
+                                height: 30.0,
+                              ),
+                              if (cubit.imagePost != null)
+                                SizedBox(
+                                  height: 220.0,
+                                  child: Stack(
+                                    alignment: Alignment.topRight,
                                     children: [
+                                      Align(
+                                        alignment: Alignment.center,
+                                        child: GestureDetector(
+                                          onTap: () {
+                                            focusNode1.unfocus();
+                                            focusNode2.unfocus();
+                                            showImage(
+                                                context, 'image-post', '',
+                                                imageUpload: cubit.imagePost);
+                                          },
+                                          child: Hero(
+                                            tag: 'image-post',
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                BorderRadius.circular(
+                                                  8.0,
+                                                ),
+                                                border: Border.all(
+                                                  width: 0.0,
+                                                  color: themeCubit.isDark
+                                                      ? Colors.white
+                                                      : Colors.black,
+                                                ),
+                                              ),
+                                              clipBehavior:
+                                              Clip.antiAliasWithSaveLayer,
+                                              child: Image.file(
+                                                File(cubit.imagePost!.path),
+                                                width: double.infinity,
+                                                height: 160.0,
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
                                       CircleAvatar(
-                                        radius: 24.0,
-                                        backgroundColor:
-                                        Theme.of(context).colorScheme.primary,
-                                        backgroundImage: NetworkImage(
-                                            '${userProfile?.imageProfile}'),
-                                      ),
-                                      const SizedBox(
-                                        width: 20.0,
-                                      ),
-                                      Text(
-                                        '${userProfile?.userName}',
-                                        style: const TextStyle(
-                                          fontSize: 17.0,
-                                          fontWeight: FontWeight.bold,
+                                        radius: 20.0,
+                                        backgroundColor: themeCubit.isDark
+                                            ? Colors.grey.shade700
+                                            : Colors.grey.shade300,
+                                        child: IconButton(
+                                          onPressed: () {
+                                            cubit.clearImagePost();
+                                          },
+                                          icon: Icon(
+                                            Icons.close_rounded,
+                                            color: themeCubit.isDark
+                                                ? Colors.white
+                                                : Colors.black,
+                                          ),
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(
-                                    height: 12.0,
-                                  ),
-                                  TextFormField(
-                                    controller: textController,
-                                    maxLines: 14,
-                                    focusNode: focusNode1,
-                                    keyboardType: TextInputType.multiline,
-                                    decoration: InputDecoration(
-                                      hintText: 'Write something ...',
-                                      suffixIcon: textController.text.isNotEmpty
-                                          ? CircleAvatar(
-                                        radius: 20.0,
-                                        backgroundColor: Theme.of(context)
-                                            .colorScheme
-                                            .primary,
-                                        child: IconButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              textController.text = '';
-                                              tagController.text = '';
-                                            });
-                                          },
-                                          icon: const Icon(
-                                            Icons.close_rounded,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      )
-                                          : null,
-                                      border: InputBorder.none,
-                                    ),
-                                  ),
-                                  if (textController.text.isNotEmpty)
-                                    TextFormField(
-                                      controller: tagController,
-                                      maxLines: 5,
-                                      focusNode: focusNode2,
-                                      keyboardType: TextInputType.multiline,
-                                      decoration: InputDecoration(
-                                        hintText:
-                                        'Add tag or tags if you want (start with #) ...',
-                                        suffixIcon: tagController.text.isNotEmpty
-                                            ? CircleAvatar(
-                                          radius: 20.0,
-                                          backgroundColor: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                          child: IconButton(
-                                            onPressed: () {
-                                              setState(() {
-                                                tagController.text = '';
-                                              });
-                                            },
-                                            icon: const Icon(
-                                              Icons.close_rounded,
-                                              color: Colors.white,
+                                ),
+                              if (cubit.imagePost != null)
+                                const SizedBox(
+                                  height: 20.0,
+                                ),
+                              if (cubit.imagePost == null)
+                                Visibility(
+                                  visible: isOut,
+                                  child: OutlinedButton(
+                                    style: ButtonStyle(
+                                        shape: MaterialStatePropertyAll(
+                                          RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              8.0,
                                             ),
                                           ),
-                                        )
-                                            : null,
-                                        border: InputBorder.none,
-                                      ),
-                                    ),
-                                  const SizedBox(
-                                    height: 30.0,
-                                  ),
-                                  if (cubit.imagePost != null)
-                                    SizedBox(
-                                      height: 220.0,
-                                      child: Stack(
-                                        alignment: Alignment.topRight,
-                                        children: [
-                                          Align(
-                                            alignment: Alignment.center,
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                focusNode1.unfocus();
-                                                focusNode2.unfocus();
-                                                showImage(
-                                                    context, 'image-post', '',
-                                                    imageUpload: cubit.imagePost);
-                                              },
-                                              child: Hero(
-                                                tag: 'image-post',
-                                                child: Container(
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                    BorderRadius.circular(
-                                                      8.0,
-                                                    ),
-                                                    border: Border.all(
-                                                      width: 0.0,
-                                                      color: themeCubit.isDark
-                                                          ? Colors.white
-                                                          : Colors.black,
-                                                    ),
-                                                  ),
-                                                  clipBehavior:
-                                                  Clip.antiAliasWithSaveLayer,
-                                                  child: Image.file(
-                                                    File(cubit.imagePost!.path),
-                                                    width: double.infinity,
-                                                    height: 160.0,
-                                                    fit: BoxFit.cover,
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          CircleAvatar(
-                                            radius: 20.0,
-                                            backgroundColor: themeCubit.isDark
-                                                ? Colors.grey.shade700
-                                                : Colors.grey.shade300,
-                                            child: IconButton(
-                                              onPressed: () {
-                                                cubit.clearImagePost();
-                                              },
-                                              icon: Icon(
-                                                Icons.close_rounded,
+                                        )),
+                                    onPressed: () {
+                                      focusNode1.unfocus();
+                                      focusNode2.unfocus();
+                                      if(checkCubit.hasInternet) {
+                                        showModalBottomSheet(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return SafeArea(
+                                              child: Material(
                                                 color: themeCubit.isDark
-                                                    ? Colors.white
-                                                    : Colors.black,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  if (cubit.imagePost != null)
-                                    const SizedBox(
-                                      height: 20.0,
-                                    ),
-                                  if (cubit.imagePost == null)
-                                    Visibility(
-                                      visible: isOut,
-                                      child: OutlinedButton(
-                                        style: ButtonStyle(
-                                            shape: MaterialStatePropertyAll(
-                                              RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(
-                                                  8.0,
+                                                    ? HexColor('171717')
+                                                    : Colors.white,
+                                                child: Wrap(
+                                                  children: <Widget>[
+                                                    ListTile(
+                                                      leading: const Icon(
+                                                          Icons.camera_alt),
+                                                      title: const Text(
+                                                          'Take a new photo'),
+                                                      onTap: () async {
+                                                        cubit.getImagePost(
+                                                            ImageSource
+                                                                .camera,
+                                                            context);
+                                                        Navigator.pop(
+                                                            context);
+                                                      },
+                                                    ),
+                                                    ListTile(
+                                                      leading: const Icon(
+                                                          Icons
+                                                              .photo_library),
+                                                      title: const Text(
+                                                          'Choose from gallery'),
+                                                      onTap: () async {
+                                                        cubit.getImagePost(
+                                                            ImageSource
+                                                                .gallery,
+                                                            context);
+                                                        Navigator.pop(
+                                                            context);
+                                                      },
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
-                                            )),
-                                        onPressed: () {
-                                          focusNode1.unfocus();
-                                          focusNode2.unfocus();
-                                          if(checkCubit.hasInternet) {
-                                            showModalBottomSheet(
-                                              context: context,
-                                              builder: (BuildContext context) {
-                                                return SafeArea(
-                                                  child: Material(
-                                                    color: themeCubit.isDark
-                                                        ? HexColor('171717')
-                                                        : Colors.white,
-                                                    child: Wrap(
-                                                      children: <Widget>[
-                                                        ListTile(
-                                                          leading: const Icon(
-                                                              Icons.camera_alt),
-                                                          title: const Text(
-                                                              'Take a new photo'),
-                                                          onTap: () async {
-                                                            cubit.getImagePost(
-                                                                ImageSource
-                                                                    .camera,
-                                                                context);
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                        ),
-                                                        ListTile(
-                                                          leading: const Icon(
-                                                              Icons
-                                                                  .photo_library),
-                                                          title: const Text(
-                                                              'Choose from gallery'),
-                                                          onTap: () async {
-                                                            cubit.getImagePost(
-                                                                ImageSource
-                                                                    .gallery,
-                                                                context);
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                );
-                                              });
-                                          } else {
-                                            showFlutterToast(message: 'No Internet Connection', state: ToastStates.error, context: context);
-                                          }
-                                        },
-                                        child: const Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              EvaIcons.imageOutline,
-                                              size: 26.0,
-                                            ),
-                                            Text(
-                                              'Add Image',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ],
+                                            );
+                                          });
+                                      } else {
+                                        showFlutterToast(message: 'No Internet Connection', state: ToastStates.error, context: context);
+                                      }
+                                    },
+                                    child: const Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Icon(
+                                          EvaIcons.imageOutline,
+                                          size: 26.0,
                                         ),
-                                      ),
+                                        SizedBox(
+                                          width: 2.0,
+                                        ),
+                                        Text(
+                                          'Add Image',
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  const SizedBox(
-                                    height: 20.0,
                                   ),
-                                ],
+                                ),
+                              const SizedBox(
+                                height: 20.0,
                               ),
-                            ),
+                            ],
                           ),
                         ),
                       ),
