@@ -1,5 +1,3 @@
-
-import 'package:bloc/bloc.dart';
 import 'package:chat/models/userModel/UserModel.dart';
 import 'package:chat/shared/components/Constants.dart';
 import 'package:chat/shared/cubit/registerCubit/RegisterStates.dart';
@@ -64,7 +62,9 @@ class RegisterCubit extends Cubit<RegisterStates> {
 
     FirebaseFirestore.instance.collection('users').doc(uId).set(model.toMap()).then((value) {
 
-      CacheHelper.saveData(key: 'isGoogleSignIn', value: false);
+      CacheHelper.saveData(key: 'isGoogleSignIn', value: false).then((value) {
+        isGoogleSignIn = false;
+      });
 
       emit(SuccessUserCreateRegisterState(model));
 

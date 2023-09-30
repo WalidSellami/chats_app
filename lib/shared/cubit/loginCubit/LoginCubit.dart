@@ -32,7 +32,9 @@ class LoginCubit extends Cubit<LoginStates> {
            'device_token': deviceToken,
          });
 
-         CacheHelper.saveData(key: 'isGoogleSignIn', value: false);
+         CacheHelper.saveData(key: 'isGoogleSignIn', value: false).then((value) {
+           isGoogleSignIn = false;
+         });
 
         emit(SuccessLoginState(value.user?.uid));
 
@@ -67,11 +69,13 @@ class LoginCubit extends Cubit<LoginStates> {
     );
 
     // Once signed in, return the UserCredential
-    FirebaseAuth.instance.signInWithCredential(credential).then((value) async {
+    await FirebaseAuth.instance.signInWithCredential(credential).then((value) async {
 
       await FirebaseFirestore.instance.collection('users').doc(value.user!.uid).get().then((v) async {
 
-        CacheHelper.saveData(key: 'isGoogleSignIn', value: true);
+        CacheHelper.saveData(key: 'isGoogleSignIn', value: true).then((value) {
+          isGoogleSignIn = true;
+        });
 
         if(v.data() == null) {
 

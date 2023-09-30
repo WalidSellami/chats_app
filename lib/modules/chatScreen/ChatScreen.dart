@@ -93,7 +93,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   horizontal: 20.0,
                                 ),
                                 child: Divider(
-                                  thickness: 0.7,
+                                  thickness: 0.8,
                                   color: Colors.grey.shade500,
                                 ),
                               ),
@@ -106,7 +106,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     fallback: (context) => (state is LoadingGetAllUsersAppState) ? Center(child: CircularIndicator(os: getOs())) :
                     const Center(
                       child: Text(
-                        'There is no user yet',
+                        'There is no user yet for chat',
                         style: TextStyle(
                           fontSize: 17.0,
                           fontWeight: FontWeight.bold,

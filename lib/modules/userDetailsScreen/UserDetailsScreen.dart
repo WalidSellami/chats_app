@@ -30,157 +30,173 @@ class UserDetailsScreen extends StatelessWidget {
             },
             text: '${user.userName}',
           ),
-          body: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 230.0,
-                  child: Stack(
-                    alignment: Alignment.bottomCenter,
-                    children: [
-                      Align(
-                        alignment: Alignment.topCenter,
-                        child: GestureDetector(
-                          onTap: () {
-                            showImage(context, 'image-cover', user.imageCover);
-                          },
-                          child: Hero(
-                            tag: 'image-cover',
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(4.0,),
-                              ),
-                              clipBehavior: Clip.antiAliasWithSaveLayer,
-                              child: Image.network('${user.imageCover}',
-                                width: double.infinity,
-                                height: 180.0,
-                                fit: BoxFit.cover,
-                                frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                                  return child;
-                                },
-                                loadingBuilder: (context, child, loadingProgress) {
-                                  if(loadingProgress == null) {
+          body: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                children: [
+                  SizedBox(
+                    height: 230.0,
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
+                      children: [
+                        Align(
+                          alignment: Alignment.topCenter,
+                          child: GestureDetector(
+                            onTap: () {
+                              showImage(context, 'image-cover', user.imageCover);
+                            },
+                            child: Hero(
+                              tag: 'image-cover',
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(4.0,),
+                                ),
+                                clipBehavior: Clip.antiAliasWithSaveLayer,
+                                child: Image.network('${user.imageCover}',
+                                  width: double.infinity,
+                                  height: 180.0,
+                                  fit: BoxFit.cover,
+                                  frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                                   if(frame == null) {
+                                     return Container(
+                                       width: double.infinity,
+                                       height: 180.0,
+                                       decoration: BoxDecoration(
+                                         border: Border.all(
+                                           width: 0.0,
+                                           color: Colors.grey.shade900,
+                                         ),
+                                       ),
+                                       child: Center(child: CircularRingIndicator(os: getOs())),
+                                     );
+                                   }
                                     return child;
-                                  } else {
-                                    return Container(
+                                  },
+                                  loadingBuilder: (context, child, loadingProgress) {
+                                    if(loadingProgress == null) {
+                                      return child;
+                                    } else {
+                                      return Container(
+                                        width: double.infinity,
+                                        height: 180.0,
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            width: 0.0,
+                                            color: Colors.grey.shade900,
+                                          ),
+                                        ),
+                                        child: Center(child: CircularRingIndicator(os: getOs())),
+                                      );
+                                    }
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return const SizedBox(
                                       width: double.infinity,
                                       height: 180.0,
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          width: 0.0,
-                                          color: Colors.grey.shade900,
-                                        ),
-                                      ),
-                                      child: Center(child: CircularRingIndicator(os: getOs())),
+                                      child: Center(child:Text('Failed to load' , style: TextStyle(fontSize: 14.0,),)),
                                     );
-                                  }
-                                },
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const SizedBox(
-                                    width: double.infinity,
-                                    height: 180.0,
-                                    child: Center(child:Text('Failed to load' , style: TextStyle(fontSize: 14.0,),)),
-                                  );
-                                },
+                                  },
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          showImage(context, 'image-profile', user.imageProfile);
-                        },
-                        child: Hero(
-                          tag: 'image-profile',
-                          child: Container(
-                            decoration: const BoxDecoration(),
-                            child: CircleAvatar(
-                              radius: 62.0,
-                              backgroundColor: ThemeCubit.get(context).isDark ? Colors.white : Colors.black,
+                        GestureDetector(
+                          onTap: () {
+                            showImage(context, 'image-profile', user.imageProfile);
+                          },
+                          child: Hero(
+                            tag: 'image-profile',
+                            child: Container(
+                              decoration: const BoxDecoration(),
                               child: CircleAvatar(
-                                radius: 60.0,
-                                backgroundColor: Theme.of(context).colorScheme.primary,
-                                backgroundImage: NetworkImage('${user.imageProfile}'),
+                                radius: 63.0,
+                                backgroundColor: ThemeCubit.get(context).isDark ? Colors.white : Colors.black,
+                                child: CircleAvatar(
+                                  radius: 60.0,
+                                  backgroundColor: Theme.of(context).colorScheme.primary,
+                                  backgroundImage: NetworkImage('${user.imageProfile}'),
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(
-                  height: 15.0,
-                ),
-                Text(
-                  '${user.userName}',
-                  style: const TextStyle(
-                    fontSize: 17.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                if(user.bio != null || user.bio != '')
                   const SizedBox(
                     height: 15.0,
                   ),
-                if(user.bio != null || user.bio != '')
                   Text(
-                    '${user.bio}',
-                    style: TextStyle(
-                      fontSize: 16.0,
-                      color: Colors.grey.shade500,
+                    '${user.userName}',
+                    style: const TextStyle(
+                      fontSize: 17.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                const SizedBox(
-                  height: 30.0,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 20.0,
-                    horizontal: 8.0,
+                  if(user.bio != null || user.bio != '')
+                    const SizedBox(
+                      height: 15.0,
+                    ),
+                  if(user.bio != null || user.bio != '')
+                    Text(
+                      '${user.bio}',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        color: Colors.grey.shade500,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  const SizedBox(
+                    height: 30.0,
                   ),
-                  child: Column(
-                    children: [
-                      Row(
-                        children: [
-                          const Icon(Icons.email_outlined),
-                          const SizedBox(
-                            width: 20.0,
-                          ),
-                          Text(
-                            '${user.email}',
-                            style: const TextStyle(
-                              fontSize: 17.0,
-                              fontWeight: FontWeight.bold,
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 20.0,
+                      horizontal: 8.0,
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.email_outlined),
+                            const SizedBox(
+                              width: 20.0,
                             ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(
-                        height: 30.0,
-                      ),
-                      Row(
-                        children: [
-                          const Icon(Icons.phone),
-                          const SizedBox(
-                            width: 20.0,
-                          ),
-                          Text(
-                            user.phone ?? '',
-                            style: const TextStyle(
-                              fontSize: 17.0,
-                              fontWeight: FontWeight.bold,
+                            Text(
+                              '${user.email}',
+                              style: const TextStyle(
+                                fontSize: 17.0,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 30.0,
+                        ),
+                        Row(
+                          children: [
+                            const Icon(Icons.phone),
+                            const SizedBox(
+                              width: 20.0,
+                            ),
+                            Text(
+                              user.phone ?? 'Not set yet',
+                              style: const TextStyle(
+                                fontSize: 17.0,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ) : const Center(

@@ -156,8 +156,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                                   index);
                                             }
                                           } else {
-                                            if (messages[index].messageImage !=
-                                                '') {
+                                            if (messages[index].messageImage != '') {
                                               return buildItemUserReceiverMessageWithImage(
                                                   messages[index],
                                                   messageId[index],
@@ -248,7 +247,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                             Clip.antiAliasWithSaveLayer,
                                         child: Image.file(
                                           File(cubit.imageMessage!.path),
-                                          width: 150.0,
+                                          width: 160.0,
                                           height: 160.0,
                                           fit: BoxFit.cover,
                                         ),
@@ -362,35 +361,33 @@ class _UserChatScreenState extends State<UserChatScreen> {
                                   width: 8.0,
                                 ),
                                 Expanded(
-                                  child: ConstrainedBox(
-                                    constraints: const BoxConstraints(
-                                      maxHeight: 120.0,
-                                    ),
-                                    child: TextFormField(
-                                      controller: messageController,
-                                      keyboardType: TextInputType.multiline,
-                                      maxLines: null,
-                                      focusNode: focusNode,
-                                      decoration: InputDecoration(
-                                        hintText: 'Write a message ...',
-                                        border: OutlineInputBorder(
-                                          borderRadius: BorderRadius.circular(
-                                            30.0,
-                                          ),
+                                  child: TextFormField(
+                                    controller: messageController,
+                                    keyboardType: TextInputType.multiline,
+                                    maxLines: null,
+                                    focusNode: focusNode,
+                                    decoration: InputDecoration(
+                                      hintText: 'Write a message ...',
+                                      constraints: const BoxConstraints(
+                                        maxHeight: 120.0,
+                                      ),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(
+                                          30.0,
                                         ),
                                       ),
-                                      onChanged: (value) {
-                                        if ((value.isNotEmpty) && (value.trim().isNotEmpty)) {
-                                          setState(() {
-                                            isVisible = true;
-                                          });
-                                        } else {
-                                          setState(() {
-                                            isVisible = false;
-                                          });
-                                        }
-                                      },
                                     ),
+                                    onChanged: (value) {
+                                      if ((value.isNotEmpty) && (value.trim().isNotEmpty)) {
+                                        setState(() {
+                                          isVisible = true;
+                                        });
+                                      } else {
+                                        setState(() {
+                                          isVisible = false;
+                                        });
+                                      }
+                                    },
                                   ),
                                 ),
                                 const SizedBox(
@@ -520,7 +517,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
             ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(
-                maxWidth: 200.0,
+                maxWidth: 240.0,
               ),
               child: Text(
                 '${model.messageText}',
@@ -573,8 +570,8 @@ class _UserChatScreenState extends State<UserChatScreen> {
                   clipBehavior: Clip.antiAliasWithSaveLayer,
                   child: Image.network(
                     '${model.messageImage}',
-                    width: 150.0,
-                    height: 150.0,
+                    width: 160.0,
+                    height: 160.0,
                     fit: BoxFit.cover,
                     frameBuilder:
                         (context, child, frame, wasSynchronouslyLoaded) {
@@ -585,8 +582,8 @@ class _UserChatScreenState extends State<UserChatScreen> {
                         return child;
                       } else {
                         return Container(
-                          width: 150,
-                          height: 150.0,
+                          width: 160.0,
+                          height: 160.0,
                           decoration: BoxDecoration(
                             border: Border.all(
                               width: 0.2,
@@ -602,8 +599,8 @@ class _UserChatScreenState extends State<UserChatScreen> {
                     },
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        width: 120.0,
-                        height: 150.0,
+                        width: 160.0,
+                        height: 160.0,
                         decoration: BoxDecoration(
                           border: Border.all(
                             width: 0.4,
@@ -649,7 +646,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                 ),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(
-                    maxWidth: 200.0,
+                    maxWidth: 240.0,
                   ),
                   child: Text(
                     '${model.messageText}',
@@ -691,7 +688,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
             ),
             child: ConstrainedBox(
               constraints: const BoxConstraints(
-                maxWidth: 200.0,
+                maxWidth: 240.0,
               ),
               child: Text(
                 '${model.messageText}',
@@ -744,8 +741,8 @@ class _UserChatScreenState extends State<UserChatScreen> {
                   clipBehavior: Clip.antiAliasWithSaveLayer,
                   child: Image.network(
                     '${model.messageImage}',
-                    width: 150.0,
-                    height: 150.0,
+                    width: 160.0,
+                    height: 160.0,
                     fit: BoxFit.cover,
                     frameBuilder:
                         (context, child, frame, wasSynchronouslyLoaded) {
@@ -756,8 +753,8 @@ class _UserChatScreenState extends State<UserChatScreen> {
                         return child;
                       } else {
                         return Container(
-                          width: 150,
-                          height: 150.0,
+                          width: 160,
+                          height: 160.0,
                           decoration: BoxDecoration(
                             border: Border.all(
                               width: 0.4,
@@ -773,8 +770,8 @@ class _UserChatScreenState extends State<UserChatScreen> {
                     },
                     errorBuilder: (context, error, stackTrace) {
                       return Container(
-                        width: 150.0,
-                        height: 150.0,
+                        width: 160.0,
+                        height: 160.0,
                         decoration: BoxDecoration(
                           border: Border.all(
                             width: 0.6,
@@ -820,7 +817,7 @@ class _UserChatScreenState extends State<UserChatScreen> {
                 ),
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(
-                    maxWidth: 200.0,
+                    maxWidth: 240.0,
                   ),
                   child: Text(
                     '${model.messageText}',

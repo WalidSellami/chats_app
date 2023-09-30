@@ -101,6 +101,8 @@ class _PostScreenState extends State<PostScreen> {
                       appBar: defaultAppBar(
                           text: 'Add Post',
                           onPress: () {
+                            focusNode1.unfocus();
+                            focusNode2.unfocus();
                             Navigator.pop(context);
                           },
                           actions: [
@@ -173,11 +175,15 @@ class _PostScreenState extends State<PostScreen> {
                                   const SizedBox(
                                     width: 20.0,
                                   ),
-                                  Text(
-                                    '${userProfile?.userName}',
-                                    style: const TextStyle(
-                                      fontSize: 17.0,
-                                      fontWeight: FontWeight.bold,
+                                  Expanded(
+                                    child: Text(
+                                      '${userProfile?.userName}',
+                                      maxLines: 1,
+                                      style: const TextStyle(
+                                        fontSize: 17.0,
+                                        overflow: TextOverflow.ellipsis,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ],

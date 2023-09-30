@@ -137,7 +137,7 @@ class _UsersLikeScreenState extends State<UsersLikeScreen> {
               '${user.userName}',
               maxLines: 1,
               style: const TextStyle(
-                fontSize: 16.0,
+                fontSize: 17.0,
                 overflow: TextOverflow.ellipsis,
                 fontWeight: FontWeight.bold,
               ),

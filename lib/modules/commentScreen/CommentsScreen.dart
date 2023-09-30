@@ -48,6 +48,7 @@ class CommentsScreen extends StatelessWidget {
                   body: (checkCubit.hasInternet) ? ConditionalBuilder(
                     condition: comments.isNotEmpty,
                     builder: (context) => ListView.builder(
+                      physics: const BouncingScrollPhysics(),
                       itemBuilder: (context, index) => buildItemComment(
                           comments[index], postId, commentsId[index], context),
                       itemCount: comments.length,

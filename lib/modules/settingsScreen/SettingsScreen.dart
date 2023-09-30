@@ -29,8 +29,6 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
 
-  bool? isGoogleSignIn;
-
 
   @override
   void initState() {
@@ -72,8 +70,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       }
                     });
                   });
+                }
 
-
+                if(state is ErrorSaveUserAccountAppState) {
+                  Navigator.pop(context);
+                  showFlutterToast(message: state.error.toString(), state: ToastStates.error, context: context);
                 }
 
               },
@@ -185,6 +186,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           Text(
                             '${userProfile?.userName}',
+                            textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontSize: 17.0,
                               fontWeight: FontWeight.bold,
@@ -197,6 +199,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           if(userProfile?.bio != null || userProfile?.bio != '')
                             Text(
                               '${userProfile?.bio}',
+                              textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 16.0,
                                 color: Colors.grey.shade500,

@@ -78,7 +78,7 @@ class _UsersScreenState extends State<UsersScreen> {
                     fallback: (context) => (state is LoadingGetAllUsersAppState) ? CircularIndicator(os: getOs()) :
                     const Center(
                       child: Text(
-                        'There is no user',
+                        'There is no user yet',
                         style: TextStyle(
                           fontSize: 17.0,
                           fontWeight: FontWeight.bold,

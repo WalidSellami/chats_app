@@ -170,6 +170,10 @@ defaultAppBar({
   ),
   title: Text(
     text ?? '',
+    maxLines: 1,
+    style: const TextStyle(
+      overflow: TextOverflow.ellipsis,
+    ),
   ),
   titleSpacing: 5.0,
   actions: actions,

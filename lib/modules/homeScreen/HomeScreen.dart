@@ -239,6 +239,19 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 160.0,
                   fit: BoxFit.cover,
                   frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                    if(frame == null) {
+                      return Container(
+                        width: double.infinity,
+                        height: 160.0,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            width: 0.2,
+                            color: ThemeCubit.get(context).isDark ? Colors.white : Colors.grey.shade900,
+                          ),
+                        ),
+                        child: Center(child: CircularRingIndicator(os: getOs())),
+                      );
+                    }
                     return child;
                   },
                   loadingBuilder: (context, child, loadingProgress) {

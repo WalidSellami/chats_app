@@ -97,6 +97,15 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
                       onChanged: (value) {
                         if(checkCubit.hasInternet) {
                           cubit.searchUser(value);
+                        } else {
+                          showFlutterToast(message: 'No Internet Connection', state: ToastStates.error, context: context);
+                        }
+                      },
+                      onFieldSubmitted: (value) {
+                        if(checkCubit.hasInternet) {
+                          cubit.searchUser(value);
+                        } else {
+                          showFlutterToast(message: 'No Internet Connection', state: ToastStates.error, context: context);
                         }
                       },
                     ),
@@ -122,7 +131,7 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
                             itemCount: users.length),
                         fallback: (context) => const Center(
                           child: Text(
-                            'There is no user',
+                            'There is no user \nyou are looking for',
                             style: TextStyle(
                                 fontSize: 17.0,
                                 fontWeight: FontWeight.bold
@@ -162,14 +171,21 @@ class _SearchUserScreenState extends State<SearchUserScreen> {
     borderRadius: BorderRadius.circular(4.0,),
     onTap: () {
       focusNode.unfocus();
-       if(AppCubit.get(context).currentIndex == 1) {
+      if(CheckCubit.get(context).hasInternet) {
 
-         Navigator.of(context).push(createSecondRoute(screen: UserChatScreen(user: user)));
+        if(AppCubit.get(context).currentIndex == 1) {
 
-       } else if(AppCubit.get(context).currentIndex == 3) {
+          Navigator.of(context).push(createSecondRoute(screen: UserChatScreen(user: user)));
 
-         Navigator.of(context).push(createRoute(screen: UserDetailsScreen(user: user)));
-       }
+        } else if(AppCubit.get(context).currentIndex == 3) {
+
+          Navigator.of(context).push(createRoute(screen: UserDetailsScreen(user: user)));
+        }
+      } else {
+
+        showFlutterToast(message: 'No Internet Connection', state: ToastStates.error, context: context);
+      }
+
     },
     child: Padding(
       padding: const EdgeInsets.all(10.0),

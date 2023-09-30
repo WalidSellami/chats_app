@@ -628,26 +628,26 @@ class AppCubit extends Cubit<AppStates> {
 
     emit(LoadingDeleteAllCommentsForPostAppState());
 
+    for (var elt in comments) {
+
+      if(elt.imageComment != '') {
+
+        String fileName = getFileNameFromUrl(elt.imageComment!);
+
+        firebase_storage.FirebaseStorage.instance.ref().child('posts/comments/$fileName').delete().then((value) {
+
+          emit(SuccessClearAppState());
+        }).catchError((error) {
+
+          emit(ErrorDeleteCommentImageAppState(error));
+        });
+      }
+
+    }
+
     for (var element in commentsId) {
 
       FirebaseFirestore.instance.collection('posts').doc(postId).collection('comments').doc(element).delete().then((value) {
-
-        for (var elt in comments) {
-
-          if(elt.imageComment != '') {
-
-            String fileName = getFileNameFromUrl(elt.imageComment!);
-
-            firebase_storage.FirebaseStorage.instance.ref().child('posts/comments/$fileName').delete().then((value) {
-
-              emit(SuccessClearAppState());
-            }).catchError((error) {
-
-              emit(ErrorDeleteCommentImageAppState(error));
-            });
-          }
-
-        }
 
         emit(SuccessDeleteAllCommentsForPostAppState());
 

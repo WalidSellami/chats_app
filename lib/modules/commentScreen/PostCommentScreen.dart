@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:chat/shared/adaptive/circularIndicator/CircularRingIndicator.dart';
 import 'package:chat/shared/components/Components.dart';
 import 'package:chat/shared/components/Constants.dart';
@@ -128,6 +127,7 @@ class _PostCommentScreenState extends State<PostCommentScreen> {
                 ],
               ),
               body: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Column(
@@ -143,11 +143,15 @@ class _PostCommentScreenState extends State<PostCommentScreen> {
                           const SizedBox(
                             width: 20.0,
                           ),
-                          Text(
-                            '${userProfile?.userName}',
-                            style: const TextStyle(
-                              fontSize: 17.0,
-                              fontWeight: FontWeight.bold,
+                          Expanded(
+                            child: Text(
+                              '${userProfile?.userName}',
+                              maxLines: 1,
+                              style: const TextStyle(
+                                fontSize: 17.0,
+                                overflow: TextOverflow.ellipsis,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],
@@ -157,29 +161,29 @@ class _PostCommentScreenState extends State<PostCommentScreen> {
                       ),
                       TextFormField(
                         controller: textController,
-                        maxLines: 8,
+                        maxLines: null,
                         focusNode: focusNode,
                         keyboardType: TextInputType.multiline,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: 'Write something ...',
-                          suffixIcon: textController.text.isNotEmpty
-                              ? CircleAvatar(
-                            radius: 20.0,
-                            backgroundColor:
-                            Theme.of(context).colorScheme.primary,
-                            child: IconButton(
-                              onPressed: () {
-                                setState(() {
-                                  textController.text = '';
-                                });
-                              },
-                              icon: const Icon(
-                                Icons.close_rounded,
-                                color: Colors.white,
-                              ),
-                            ),
-                          )
-                              : null,
+                          // suffixIcon: textController.text.isNotEmpty
+                          //     ? CircleAvatar(
+                          //   radius: 20.0,
+                          //   backgroundColor:
+                          //   Theme.of(context).colorScheme.primary,
+                          //   child: IconButton(
+                          //     onPressed: () {
+                          //       setState(() {
+                          //         textController.text = '';
+                          //       });
+                          //     },
+                          //     icon: const Icon(
+                          //       Icons.close_rounded,
+                          //       color: Colors.white,
+                          //     ),
+                          //   ),
+                          // )
+                          //     : null,
                           border: InputBorder.none,
                         ),
                       ),

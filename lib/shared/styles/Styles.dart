@@ -6,6 +6,7 @@ import 'package:hexcolor/hexcolor.dart';
 
 ThemeData lightMode = ThemeData(
   useMaterial3: true,
+  visualDensity: VisualDensity.adaptivePlatformDensity,
   fontFamily: 'Varela',
   scaffoldBackgroundColor: Colors.white,
   colorScheme: ColorScheme.light(
@@ -30,15 +31,13 @@ ThemeData lightMode = ThemeData(
       fontWeight: FontWeight.bold,
     ),
   ),
-
-
-
 );
 
 
 
 ThemeData darkMode = ThemeData(
   useMaterial3: true,
+  visualDensity: VisualDensity.adaptivePlatformDensity,
   fontFamily: 'Varela',
   scaffoldBackgroundColor: HexColor('161616'),
   colorScheme: ColorScheme.dark(
@@ -63,7 +62,4 @@ ThemeData darkMode = ThemeData(
       fontWeight: FontWeight.bold,
     ),
   ),
-
-
-
 );
