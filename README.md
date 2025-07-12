@@ -6,4 +6,7 @@ A social networking app built with Flutter that lets users post, like, comment, 
 
 ![1](https://github.com/SellamiWalid/chats_app/assets/119450519/277c0b21-0906-494b-b9bb-ae87c3c41612)
 
+> 📸 **Note:** The following section contains images.  
+> ⏳ Depending on your internet connection, they may take a few seconds to load. Please be patient.
+
 
